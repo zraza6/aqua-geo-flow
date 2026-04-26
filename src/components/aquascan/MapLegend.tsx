@@ -4,7 +4,7 @@ import { GLASS, stopMapPropagation } from "./stopMap";
 export function MapLegend({ layers }: { layers: LayerState }) {
   return (
     <div
-      className="absolute bottom-3 left-3 z-[1000] sm:bottom-6 sm:left-6"
+      className="pointer-events-auto"
       {...stopMapPropagation}
     >
       <div className={`${GLASS} flex flex-col gap-2.5 px-4 py-3 sm:px-5 sm:py-4`}>

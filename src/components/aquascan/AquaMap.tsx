@@ -4,6 +4,10 @@ import "leaflet-draw"; // side-effect: registers L.Draw on the global L
 import { EditControl } from "react-leaflet-draw";
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef } from "react";
 import { MapFabsInner } from "./MapFabs";
+import { patchLeafletDraw } from "./patchLeafletDraw";
+
+// Patch leaflet-draw 1.0.4 ReferenceError in readableArea (mousemove crash)
+patchLeafletDraw();
 
 // Fix default marker icon paths
 delete (L.Icon.Default.prototype as any)._getIconUrl;

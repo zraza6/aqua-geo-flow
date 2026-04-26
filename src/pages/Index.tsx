@@ -16,18 +16,19 @@ import {
 } from "@/components/aquascan/AnalysisPanel";
 import { TopNavbar } from "@/components/aquascan/TopNavbar";
 import { MapLegend } from "@/components/aquascan/MapLegend";
-import { LayersDialog } from "@/components/aquascan/LayersDialog";
+import { CommandHub, type CommandTab } from "@/components/aquascan/CommandHub";
+import { ContextPanel } from "@/components/aquascan/ContextPanel";
 import { stopMapPropagation } from "@/components/aquascan/stopMap";
 
 const Index = () => {
   const mapRef = useRef<AquaMapHandle>(null);
 
+  const [activeTab, setActiveTab] = useState<CommandTab>("dashboard");
   const [layers, setLayers] = useState<LayerState>({
     waterEvolution: false,
     sarUrban: false,
     dem: true,
   });
-  const [layersOpen, setLayersOpen] = useState(false);
 
   const [analyzing, setAnalyzing] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
@@ -42,10 +43,9 @@ const Index = () => {
   const timersRef = useRef<number[]>([]);
   const pendingZoneRef = useRef<string | null>(null);
 
-  // Mobile breakpoint detection (sheet vs sidebar)
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
-    const mq = window.matchMedia("(max-width: 640px)");
+    const mq = window.matchMedia("(max-width: 768px)");
     const update = () => setIsMobile(mq.matches);
     update();
     mq.addEventListener("change", update);
@@ -59,11 +59,7 @@ const Index = () => {
     };
   }, []);
 
-  const triggerAnalysis = (
-    name: string,
-    area: number,
-    zoneId: string | null,
-  ) => {
+  const triggerAnalysis = (name: string, area: number, zoneId: string | null) => {
     setHasInteracted(true);
     setReservoirBuilt(false);
     setReservoirTargetId(null);
@@ -84,23 +80,26 @@ const Index = () => {
     triggerAnalysis(z?.name ?? "Custom AOI · Drawn", p.areaKm2, p.zoneId ?? null);
   };
 
+  const handleZoneClickFromPanel = (id: string) => {
+    const z = RECOMMENDED_ZONES.find((r) => r.id === id);
+    if (!z) return;
+    const approxArea = 95 + Math.random() * 40;
+    triggerAnalysis(z.name, approxArea, id);
+  };
+
   const handleToggleLayer = (k: keyof LayerState) =>
     setLayers((s) => ({ ...s, [k]: !s[k] }));
 
   const handleSimulate = () => {
     setSimulationState("deviating");
-    const t1 = window.setTimeout(() => {
-      setSimulationState("constructing");
-    }, 1500);
-    const t2 = window.setTimeout(() => {
-      setSimulationState("filling");
-    }, 3000);
+    const t1 = window.setTimeout(() => setSimulationState("constructing"), 1500);
+    const t2 = window.setTimeout(() => setSimulationState("filling"), 3000);
     const t3 = window.setTimeout(() => {
       setReservoirTargetId(pendingZoneRef.current);
       setReservoirBuilt(true);
       setSimulationState("completed");
       toast.success("PostGIS Database Updated", {
-        description: "Reservoir successfully modeled · intervention dispatched.",
+        description: "Reservoir modeled successfully · intervention dispatched.",
         icon: <CheckCircle2 className="h-4 w-4 text-cyan-400" />,
         duration: 5000,
       });
@@ -129,7 +128,7 @@ const Index = () => {
 
   return (
     <main className="relative h-screen w-screen overflow-hidden bg-slate-950">
-      {/* MAP — full bleed */}
+      {/* === LAYER 0: MAP === */}
       <div className="absolute inset-0 z-0">
         <AquaMap
           ref={mapRef}
@@ -138,11 +137,11 @@ const Index = () => {
           reservoirTargetId={reservoirTargetId}
           onResetSignal={resetSignal}
           layers={layers}
-          onOpenLayers={() => setLayersOpen(true)}
+          onOpenLayers={() => setActiveTab("layers")}
         />
       </div>
 
-      {/* Subtle vignette + grid above map, under panels */}
+      {/* Decorative grid + vignette (pointer-events-none, between map and UI) */}
       <div className="pointer-events-none absolute inset-0 z-[5] grid-overlay opacity-15 mix-blend-overlay" />
       <div
         className="pointer-events-none absolute inset-0 z-[5] opacity-50"
@@ -152,54 +151,74 @@ const Index = () => {
         }}
       />
 
-      {/* TOP GLASS NAVBAR */}
-      <TopNavbar />
+      {/* === LAYER 1: UI OVERLAY (anti-freeze single overlay, panels opt-in to events) === */}
+      <div className="pointer-events-none absolute inset-0 z-50 flex flex-col p-3 sm:p-6">
+        {/* TOP — brand bar */}
+        <div className="pointer-events-none flex shrink-0 justify-center">
+          <TopNavbar />
+        </div>
 
-      {/* HINT — first-run only */}
+        {/* MIDDLE — left nav + context panel + right analysis */}
+        <div className="pointer-events-none mt-4 flex flex-1 items-stretch justify-between gap-3 overflow-hidden sm:gap-4">
+          {/* LEFT: Command Hub + (optional) Context panel */}
+          <div className="pointer-events-none flex max-h-full items-stretch gap-3 sm:gap-4">
+            <div className="pointer-events-none flex items-center">
+              <CommandHub active={activeTab} onChange={setActiveTab} />
+            </div>
+            {/* Hide context panel on mobile (handled via top nav tap) */}
+            <div className="pointer-events-none hidden max-h-full md:block">
+              <ContextPanel
+                tab={activeTab}
+                layers={layers}
+                onToggleLayer={handleToggleLayer}
+                onZoneClick={handleZoneClickFromPanel}
+              />
+            </div>
+          </div>
+
+          {/* RIGHT: Analysis panel (desktop only — mobile uses Sheet) */}
+          <div className="pointer-events-none flex max-h-full items-stretch">
+            {panelOpen && !isMobile && (
+              <AnalysisPanel
+                onClose={handleClosePanel}
+                onSimulate={handleSimulate}
+                onReset={handleReset}
+                area={areaKm2}
+                zoneName={zoneName}
+                simulationState={simulationState}
+              />
+            )}
+          </div>
+        </div>
+
+        {/* BOTTOM — legend (always visible, glass) */}
+        <div className="pointer-events-none mt-3 flex shrink-0 justify-start sm:mt-4">
+          <MapLegend layers={layers} />
+        </div>
+      </div>
+
+      {/* HINT — first-run, above everything */}
       {!hasInteracted && !analyzing && simulationState === "idle" && !panelOpen && (
         <div
-          className="pointer-events-none absolute left-1/2 top-24 z-[999] -translate-x-1/2 px-3"
+          className="pointer-events-none absolute left-1/2 top-24 z-[60] -translate-x-1/2 px-3"
           {...stopMapPropagation}
         >
-          <div className="flex items-center gap-2.5 rounded-full border border-white/10 bg-slate-900/40 px-4 py-2 backdrop-blur-2xl shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+          <div className="flex items-center gap-2.5 rounded-full border border-white/10 bg-slate-900/40 px-4 py-2 backdrop-blur-2xl shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
             <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-75" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-cyan-400" />
             </span>
             <p className="font-mono text-[10px] font-light uppercase tracking-[0.18em] text-white/85">
-              Click a gold zone or use the draw FAB
+              Click a gold valley · or draw a custom AOI
             </p>
           </div>
         </div>
       )}
 
-      {/* LEGEND */}
-      <MapLegend layers={layers} />
-
-      {/* LAYERS DIALOG */}
-      <LayersDialog
-        open={layersOpen}
-        onOpenChange={setLayersOpen}
-        layers={layers}
-        onToggle={handleToggleLayer}
-      />
-
-      {/* LOADING */}
+      {/* LOADING OVERLAY */}
       {analyzing && <LoadingOverlay />}
 
-      {/* ANALYSIS — desktop floating sidebar */}
-      {panelOpen && !isMobile && (
-        <AnalysisPanel
-          onClose={handleClosePanel}
-          onSimulate={handleSimulate}
-          onReset={handleReset}
-          area={areaKm2}
-          zoneName={zoneName}
-          simulationState={simulationState}
-        />
-      )}
-
-      {/* ANALYSIS — mobile bottom sheet */}
+      {/* MOBILE ANALYSIS — bottom sheet */}
       <Sheet
         open={panelOpen && isMobile}
         onOpenChange={(v) => {

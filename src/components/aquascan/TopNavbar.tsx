@@ -4,7 +4,7 @@ import { GLASS, stopMapPropagation } from "./stopMap";
 export function TopNavbar() {
   return (
     <div
-      className="absolute left-1/2 top-3 z-[1000] -translate-x-1/2 px-3 sm:top-4"
+      className="pointer-events-auto"
       {...stopMapPropagation}
     >
       <div
