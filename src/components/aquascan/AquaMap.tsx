@@ -22,7 +22,6 @@ export interface DrawnPolygon {
 export interface LayerState {
   waterEvolution: boolean;
   sarUrban: boolean;
-  dem: boolean;
 }
 
 interface Props {
@@ -90,17 +89,11 @@ function polygonAreaKm2(latlngs: L.LatLng[]): number {
   return Math.abs(total) / 1_000_000;
 }
 
-function MapTuning({ dem }: { dem: boolean }) {
+function MapTuning() {
   const map = useMap();
   useEffect(() => {
     map.attributionControl.setPrefix("");
   }, [map]);
-  useEffect(() => {
-    const container = map.getContainer();
-    container.style.filter = dem
-      ? "contrast(1.18) saturate(0.55) brightness(0.92) hue-rotate(-8deg)"
-      : "";
-  }, [dem, map]);
   return null;
 }
 
@@ -157,10 +150,10 @@ export function AquaMap({
       zoom={7}
       minZoom={3}
       zoomControl={true}
-      className="h-full w-full"
+      className="h-full w-full z-0"
       worldCopyJump
     >
-      <MapTuning dem={layers.dem} />
+      <MapTuning />
 
       {/* Topographic base — reveals rivers + elevation contours */}
       <TileLayer
