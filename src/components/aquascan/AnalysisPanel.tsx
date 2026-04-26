@@ -1,171 +1,354 @@
-import { X, Mountain, CloudRain, Gauge, Dam, ArrowRight, ShieldCheck, Calendar } from "lucide-react";
+import { X, Mountain, CloudRain, Gauge, Dam, ShieldCheck, Calendar, Loader2, CheckCircle2, RotateCcw, Waves, Cpu, Droplets } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { stopMapPropagation } from "./stopMap";
+
+export type SimulationState =
+  | "idle"
+  | "deviating"
+  | "constructing"
+  | "filling"
+  | "completed";
 
 interface Props {
   onClose: () => void;
   onSimulate: () => void;
+  onReset: () => void;
   area: number;
   zoneName?: string;
-  scenarioStep: number; // 0 idle, 1-3 running
+  simulationState: SimulationState;
+  /** When true, render inline (inside Sheet on mobile). Otherwise float as right sidebar. */
+  inline?: boolean;
 }
 
-export function AnalysisPanel({ onClose, onSimulate, area, zoneName, scenarioStep }: Props) {
-  const running = scenarioStep > 0 && scenarioStep < 4;
-
+export function AnalysisPanel(props: Props) {
+  if (props.inline) {
+    return (
+      <div className="flex h-full w-full flex-col" {...stopMapPropagation}>
+        <PanelBody {...props} />
+      </div>
+    );
+  }
   return (
-    <aside className="absolute right-4 top-4 bottom-4 z-[1100] flex w-[400px] max-w-[calc(100vw-2rem)] animate-slide-in-right flex-col">
-      <div className="flex flex-1 flex-col overflow-hidden rounded-3xl border border-white/10 bg-black/40 shadow-2xl backdrop-blur-2xl">
-        {/* Header */}
-        <div className="relative flex flex-col gap-2 border-b border-white/10 bg-gradient-radial-glow px-6 py-5">
-          <button
-            onClick={onClose}
-            disabled={running}
-            className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-foreground/60 transition-colors hover:bg-white/10 hover:text-foreground disabled:opacity-40"
-          >
-            <X className="h-4 w-4" />
-          </button>
-          <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-primary text-glow-cyan">
-            Earth Engine · Viability Analysis
-          </p>
-          <h2 className="text-lg font-semibold leading-tight">
-            {zoneName ?? "Custom AOI"}
-          </h2>
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[10px] text-foreground/55">
-            <span>{area.toFixed(1)} km²</span>
-            <span className="h-1 w-1 rounded-full bg-white/20" />
-            <span>EPSG:4326</span>
-            <span className="h-1 w-1 rounded-full bg-white/20" />
-            <span>UTC {new Date().toUTCString().slice(17, 22)}</span>
-          </div>
-        </div>
-
-        <div className="flex-1 space-y-4 overflow-y-auto px-5 py-4">
-          {/* Viability score */}
-          <div className="rounded-xl border border-success/40 bg-success/5 p-4 shadow-[inset_0_0_30px_hsl(var(--success)/0.08)]">
-            <div className="flex items-center gap-2">
-              <Gauge className="h-4 w-4 text-success" />
-              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-success">
-                Viability Score
-              </p>
-            </div>
-            <div className="mt-1 flex items-baseline gap-3">
-              <span className="text-4xl font-bold text-success" style={{ textShadow: "0 0 12px hsl(var(--success) / 0.6)" }}>
-                88%
-              </span>
-              <span className="font-mono text-xs uppercase tracking-wider text-success">
-                Highly Recommended
-              </span>
-            </div>
-            <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-surface-elevated">
-              <div
-                className="h-full rounded-full bg-gradient-to-r from-success to-primary"
-                style={{ width: "88%", boxShadow: "0 0 12px hsl(var(--success)/0.6)" }}
-              />
-            </div>
-            <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
-              Composite of DEM slope, NDWI water proximity, SAR urban exclusion and ERA5 precipitation forecast.
-            </p>
-          </div>
-
-          {/* DEM */}
-          <Section icon={Mountain} title="DEM Analysis" tone="warning">
-            <p className="text-[12px] text-foreground/90">
-              Ideal <span className="font-semibold text-warning">steep valley profile</span> detected.
-            </p>
-            <div className="mt-2 grid grid-cols-3 gap-2">
-              <Stat label="Mean slope" value="14.2°" />
-              <Stat label="Δ Elevation" value="312 m" />
-              <Stat label="Catchment" value="184 km²" />
-            </div>
-            {/* Mock terrain svg */}
-            <svg viewBox="0 0 200 50" className="mt-3 h-12 w-full">
-              <defs>
-                <linearGradient id="terrain" x1="0" x2="0" y1="0" y2="1">
-                  <stop offset="0%" stopColor="hsl(var(--warning))" stopOpacity="0.6" />
-                  <stop offset="100%" stopColor="hsl(var(--warning))" stopOpacity="0" />
-                </linearGradient>
-              </defs>
-              <path d="M0,40 L20,32 L40,18 L60,8 L80,22 L100,12 L120,28 L140,16 L160,30 L180,22 L200,38 L200,50 L0,50 Z" fill="url(#terrain)" />
-              <path d="M0,40 L20,32 L40,18 L60,8 L80,22 L100,12 L120,28 L140,16 L160,30 L180,22 L200,38" fill="none" stroke="hsl(var(--warning))" strokeWidth="1.2" />
-            </svg>
-          </Section>
-
-          {/* Weather */}
-          <Section icon={CloudRain} title="Weather Context · 72h Forecast" tone="primary">
-            <p className="text-[12px] text-foreground/90">
-              <span className="font-semibold text-primary">Heavy precipitation (+40 mm)</span> expected.
-              Ideal window for water capture simulation.
-            </p>
-            <div className="mt-2 flex items-end justify-between gap-1">
-              {[6, 12, 22, 18, 28, 32, 26].map((v, i) => (
-                <div key={i} className="flex flex-1 flex-col items-center gap-1">
-                  <div
-                    className="w-full rounded-t bg-gradient-to-t from-primary/30 to-primary"
-                    style={{ height: `${v * 1.4}px`, boxShadow: "0 0 8px hsl(var(--primary)/0.4)" }}
-                  />
-                  <span className="font-mono text-[8px] text-muted-foreground">{v}mm</span>
-                </div>
-              ))}
-            </div>
-            <div className="mt-2 flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-wider text-muted-foreground">
-              <Calendar className="h-3 w-3" />
-              <span>Strictly short-term · long-range forecasts excluded (unpredictable)</span>
-            </div>
-          </Section>
-
-          {/* Confidence */}
-          <div className="flex items-center gap-2 rounded-lg border border-border/50 bg-surface-elevated/40 px-3 py-2">
-            <ShieldCheck className="h-3.5 w-3.5 text-primary" />
-            <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-              Model confidence
-            </span>
-            <span className="ml-auto font-mono text-[11px] font-semibold text-primary">93.4%</span>
-          </div>
-        </div>
-
-        {/* Decision */}
-        <div className="border-t border-white/10 bg-black/30 px-6 py-5">
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={onSimulate}
-              disabled={running}
-              className="group relative flex items-center justify-center gap-2 overflow-hidden rounded-2xl border border-primary/50 bg-primary/15 px-4 py-3 text-sm font-semibold text-primary transition-all hover:bg-primary/25 hover:shadow-glow-cyan disabled:cursor-wait disabled:opacity-60"
-            >
-              <Dam className="h-4 w-4" />
-              {running ? "Simulating…" : "Simulate Dam"}
-              {!running && <ArrowRight className="h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />}
-            </button>
-            <button
-              onClick={onClose}
-              disabled={running}
-              className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-foreground/80 transition-colors hover:bg-white/10 disabled:opacity-40"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
+    <aside
+      className="absolute right-3 top-20 bottom-3 z-[1100] flex w-[calc(100vw-1.5rem)] max-w-sm animate-[slide-in-right_0.5s_cubic-bezier(0.4,0,0.2,1)] flex-col sm:right-4 sm:top-24 sm:bottom-6 sm:w-96"
+      {...stopMapPropagation}
+    >
+      <div className="flex flex-1 flex-col overflow-hidden rounded-3xl border border-white/10 bg-slate-900/40 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-2xl">
+        <PanelBody {...props} />
       </div>
     </aside>
   );
 }
 
-function Section({ icon: Icon, title, tone, children }: { icon: any; title: string; tone: "warning" | "primary"; children: React.ReactNode }) {
-  const c = tone === "warning" ? "text-warning" : "text-primary";
+function PanelBody({
+  onClose,
+  onSimulate,
+  onReset,
+  area,
+  zoneName,
+  simulationState,
+}: Props) {
+  const running =
+    simulationState === "deviating" ||
+    simulationState === "constructing" ||
+    simulationState === "filling";
+  const done = simulationState === "completed";
+
   return (
-    <div className="rounded-xl border border-border/50 bg-surface-elevated/40 p-3.5">
-      <div className="mb-1 flex items-center gap-2">
-        <Icon className={`h-3.5 w-3.5 ${c}`} />
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{title}</p>
+    <>
+      {/* Header */}
+      <div className="relative flex flex-col gap-2 border-b border-white/10 px-6 py-5">
+        <button
+          onClick={onClose}
+          disabled={running}
+          aria-label="Close"
+          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-white/60 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-40"
+        >
+          <X className="h-4 w-4" />
+        </button>
+        <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-cyan-400 [text-shadow:0_0_10px_rgba(34,211,238,0.6)]">
+          Earth Engine · Intelligence Report
+        </p>
+        <h2 className="text-lg font-semibold leading-tight text-white">
+          {zoneName ?? "Custom AOI"}
+        </h2>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[10px] font-light text-white/50">
+          <span>{area.toFixed(1)} km²</span>
+          <Dot />
+          <span>EPSG:4326</span>
+          <Dot />
+          <span>UTC {new Date().toUTCString().slice(17, 22)}</span>
+        </div>
       </div>
-      {children}
+
+      {/* Scrollable body */}
+      <div className="no-scrollbar flex-1 overflow-y-auto">
+        {/* Viability — always visible */}
+        <div className="px-5 pt-4">
+          <div className="rounded-2xl border border-emerald-400/30 bg-emerald-400/[0.06] p-4 [box-shadow:inset_0_0_30px_rgba(16,185,129,0.06)]">
+            <div className="flex items-center gap-2">
+              <Gauge className="h-4 w-4 text-emerald-400" />
+              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-emerald-400">
+                Viability Score
+              </p>
+            </div>
+            <div className="mt-1 flex items-baseline gap-3">
+              <span
+                className="text-4xl font-bold text-emerald-400"
+                style={{ textShadow: "0 0 14px rgba(16,185,129,0.6)" }}
+              >
+                88%
+              </span>
+              <span className="font-mono text-[10px] uppercase tracking-wider text-emerald-400">
+                Highly Recommended
+              </span>
+            </div>
+            <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-white/5">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400"
+                style={{ width: "88%", boxShadow: "0 0 12px rgba(16,185,129,0.6)" }}
+              />
+            </div>
+            <p className="mt-2 text-[11px] font-light leading-relaxed text-white/55">
+              Composite of DEM slope, NDWI water proximity, SAR urban exclusion
+              and ERA5 precipitation forecast.
+            </p>
+          </div>
+        </div>
+
+        {/* Accordions */}
+        <div className="px-5 py-4">
+          <Accordion type="multiple" defaultValue={["dem", "weather"]} className="flex flex-col gap-2">
+            <AccordionItem
+              value="dem"
+              className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 data-[state=open]:bg-white/[0.05]"
+            >
+              <AccordionTrigger className="py-3 hover:no-underline">
+                <span className="flex items-center gap-2.5">
+                  <Mountain className="h-3.5 w-3.5 text-amber-400" />
+                  <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/70">
+                    DEM Analysis
+                  </span>
+                </span>
+              </AccordionTrigger>
+              <AccordionContent className="pb-4">
+                <p className="text-[12px] font-light leading-relaxed text-white/85">
+                  Ideal{" "}
+                  <span className="font-semibold text-amber-400">
+                    steep valley profile
+                  </span>{" "}
+                  detected.
+                </p>
+                <div className="mt-3 grid grid-cols-3 gap-2">
+                  <Stat label="Mean slope" value="14.2°" />
+                  <Stat label="Δ Elevation" value="312 m" />
+                  <Stat label="Catchment" value="184 km²" />
+                </div>
+                <svg viewBox="0 0 200 50" className="mt-3 h-12 w-full">
+                  <defs>
+                    <linearGradient id="terrain" x1="0" x2="0" y1="0" y2="1">
+                      <stop offset="0%" stopColor="#fbbf24" stopOpacity="0.6" />
+                      <stop offset="100%" stopColor="#fbbf24" stopOpacity="0" />
+                    </linearGradient>
+                  </defs>
+                  <path
+                    d="M0,40 L20,32 L40,18 L60,8 L80,22 L100,12 L120,28 L140,16 L160,30 L180,22 L200,38 L200,50 L0,50 Z"
+                    fill="url(#terrain)"
+                  />
+                  <path
+                    d="M0,40 L20,32 L40,18 L60,8 L80,22 L100,12 L120,28 L140,16 L160,30 L180,22 L200,38"
+                    fill="none"
+                    stroke="#fbbf24"
+                    strokeWidth="1.2"
+                  />
+                </svg>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem
+              value="weather"
+              className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 data-[state=open]:bg-white/[0.05]"
+            >
+              <AccordionTrigger className="py-3 hover:no-underline">
+                <span className="flex items-center gap-2.5">
+                  <CloudRain className="h-3.5 w-3.5 text-cyan-400" />
+                  <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/70">
+                    Weather Context · 72h
+                  </span>
+                </span>
+              </AccordionTrigger>
+              <AccordionContent className="pb-4">
+                <p className="text-[12px] font-light leading-relaxed text-white/85">
+                  <span className="font-semibold text-cyan-400">
+                    Heavy precipitation (+40 mm)
+                  </span>{" "}
+                  expected. Ideal window for water capture simulation.
+                </p>
+                <div className="mt-3 flex items-end justify-between gap-1">
+                  {[6, 12, 22, 18, 28, 32, 26].map((v, i) => (
+                    <div key={i} className="flex flex-1 flex-col items-center gap-1">
+                      <div
+                        className="w-full rounded-t bg-gradient-to-t from-cyan-400/20 to-cyan-400"
+                        style={{
+                          height: `${v * 1.4}px`,
+                          boxShadow: "0 0 8px rgba(34,211,238,0.4)",
+                        }}
+                      />
+                      <span className="font-mono text-[8px] text-white/40">
+                        {v}mm
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-3 flex items-start gap-1.5 font-mono text-[9px] uppercase tracking-wider text-white/40">
+                  <Calendar className="mt-px h-3 w-3 shrink-0" />
+                  <span className="leading-relaxed normal-case tracking-normal">
+                    Strict 72h window. Long-range forecasts excluded — they are
+                    unpredictable beyond ~3 days.
+                  </span>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem
+              value="confidence"
+              className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 data-[state=open]:bg-white/[0.05]"
+            >
+              <AccordionTrigger className="py-3 hover:no-underline">
+                <span className="flex items-center gap-2.5">
+                  <ShieldCheck className="h-3.5 w-3.5 text-cyan-400" />
+                  <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/70">
+                    Model Confidence
+                  </span>
+                </span>
+              </AccordionTrigger>
+              <AccordionContent className="pb-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-light text-white/70">
+                    Ensemble agreement
+                  </span>
+                  <span className="font-mono text-sm font-semibold text-cyan-400">
+                    93.4%
+                  </span>
+                </div>
+                <p className="mt-2 text-[11px] font-light leading-relaxed text-white/55">
+                  3 independent inference passes (XGBoost, U-Net SAR, ERA5
+                  bias-corrected) converged on the same recommendation.
+                </p>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </div>
+      </div>
+
+      {/* Decision footer — embedded simulator */}
+      <div className="border-t border-white/10 bg-slate-950/40 px-5 py-5">
+        <SimulatorButton
+          state={simulationState}
+          onSimulate={onSimulate}
+          onReset={onReset}
+        />
+        {!done && simulationState === "idle" && (
+          <button
+            onClick={onClose}
+            className="mt-2.5 w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-2.5 text-[12px] font-medium text-white/65 transition-colors hover:bg-white/10 hover:text-white"
+          >
+            Cancel
+          </button>
+        )}
+      </div>
+    </>
+  );
+}
+
+function SimulatorButton({
+  state,
+  onSimulate,
+  onReset,
+}: {
+  state: SimulationState;
+  onSimulate: () => void;
+  onReset: () => void;
+}) {
+  if (state === "idle") {
+    return (
+      <button
+        onClick={onSimulate}
+        className="group relative flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-2xl border border-cyan-400/50 bg-gradient-to-br from-cyan-500/30 via-cyan-400/20 to-cyan-600/30 px-5 py-4 text-sm font-semibold text-cyan-100 transition-all hover:border-cyan-300 hover:from-cyan-400/40 hover:to-cyan-500/40 [box-shadow:0_0_24px_rgba(34,211,238,0.4),inset_0_1px_0_rgba(255,255,255,0.15)]"
+      >
+        <Dam className="h-4 w-4" />
+        <span className="font-mono text-[11px] uppercase tracking-[0.2em]">
+          Simulate Reservoir Construction
+        </span>
+        <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/15 to-transparent transition-transform duration-1000 group-hover:translate-x-full" />
+      </button>
+    );
+  }
+
+  if (state === "completed") {
+    return (
+      <button
+        onClick={onReset}
+        className="w-full rounded-2xl border border-white/15 bg-white/[0.05] px-5 py-4 text-sm font-medium text-white/85 transition-colors hover:border-cyan-400/40 hover:bg-cyan-400/10 hover:text-cyan-300"
+      >
+        <RotateCcw className="h-4 w-4" />
+        <span className="font-mono text-[11px] uppercase tracking-[0.2em]">
+          Reset Scenario
+        </span>
+      </button>
+    );
+  }
+
+  // running states
+  const stages: Record<
+    Exclude<SimulationState, "idle" | "completed">,
+    { label: string; icon: typeof Waves; n: number }
+  > = {
+    deviating: { label: "Deviating river flow…", icon: Waves, n: 1 },
+    constructing: { label: "Constructing primary wall…", icon: Cpu, n: 2 },
+    filling: { label: "Filling basin…", icon: Droplets, n: 3 },
+  };
+  const { label, icon: Icon, n } = stages[state];
+
+  return (
+    <div className="flex w-full flex-col gap-2.5">
+      <div className="flex items-center justify-center gap-2.5 rounded-2xl border border-cyan-400/40 bg-cyan-400/10 px-5 py-4 text-cyan-200 [box-shadow:0_0_18px_rgba(34,211,238,0.3),inset_0_1px_0_rgba(255,255,255,0.08)]">
+        <Loader2 className="h-4 w-4 animate-spin" />
+        <Icon className="h-4 w-4 animate-pulse" />
+        <span className="font-mono text-[11px] uppercase tracking-[0.2em]">
+          Step {n}: {label}
+        </span>
+      </div>
+      <div className="flex h-1 gap-1">
+        {[1, 2, 3].map((i) => (
+          <div
+            key={i}
+            className={`h-full flex-1 rounded-full transition-all ${
+              i <= n
+                ? "bg-cyan-400 [box-shadow:0_0_8px_rgba(34,211,238,0.7)]"
+                : "bg-white/10"
+            }`}
+          />
+        ))}
+      </div>
     </div>
   );
 }
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-md border border-border/40 bg-surface/40 px-2 py-1.5">
-      <p className="font-mono text-[8px] uppercase tracking-wider text-muted-foreground">{label}</p>
-      <p className="text-[12px] font-semibold text-foreground">{value}</p>
+    <div className="rounded-xl border border-white/10 bg-white/[0.04] px-2 py-1.5">
+      <p className="font-mono text-[8px] uppercase tracking-wider text-white/45">
+        {label}
+      </p>
+      <p className="text-[12px] font-semibold text-white">{value}</p>
     </div>
   );
 }
+
+function Dot() {
+  return <span className="h-1 w-1 rounded-full bg-white/20" />;
+}
+
+// Re-export icon helper to keep API tidy
+export { CheckCircle2 };

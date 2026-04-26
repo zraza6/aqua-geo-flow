@@ -180,23 +180,31 @@
 .leaflet-control-zoom a:hover {
   background: hsl(188 95% 55% / 0.2) !important;
 }
-.leaflet-draw-toolbar a {
-  background-color: hsl(220 40% 12% / 0.95) !important;
-  border: 1px solid hsl(188 95% 55% / 0.3) !important;
-}
-.leaflet-draw-toolbar a:hover {
-  background-color: hsl(188 95% 55% / 0.25) !important;
-}
-.leaflet-draw-actions a {
-  background-color: hsl(220 40% 14%) !important;
-  color: hsl(188 95% 55%) !important;
-  border-left: 1px solid hsl(188 95% 55% / 0.2) !important;
-}
+/* Hide default Leaflet-Draw toolbar — we use custom FABs */
+.leaflet-draw.leaflet-control { display: none !important; }
 .leaflet-draw-tooltip {
   background: hsl(222 51% 8% / 0.92) !important;
   border: 1px solid hsl(188 95% 55% / 0.4) !important;
   color: hsl(188 95% 55%) !important;
-  border-radius: 6px !important;
+  border-radius: 8px !important;
   backdrop-filter: blur(8px);
+  font-family: 'Inter', system-ui, sans-serif !important;
+  padding: 6px 10px !important;
 }
 .leaflet-draw-tooltip:before { border-right-color: hsl(188 95% 55% / 0.4) !important; }
+
+/* Leaflet tooltip styling for labels */
+.leaflet-tooltip {
+  background: hsl(222 51% 8% / 0.92) !important;
+  border: 1px solid hsl(188 95% 55% / 0.3) !important;
+  color: hsl(200 30% 95%) !important;
+  border-radius: 10px !important;
+  padding: 4px 10px !important;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4) !important;
+}
+.leaflet-tooltip:before { border-top-color: hsl(188 95% 55% / 0.3) !important; }
+
+/* Hide scrollbars but keep scrollable */
+.no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
