@@ -1,6 +1,7 @@
 import { MapContainer, TileLayer, FeatureGroup, useMap } from "react-leaflet";
-import { EditControl } from "react-leaflet-draw";
 import L from "leaflet";
+import "leaflet-draw"; // side-effect: registers L.Draw on the global L
+import { EditControl } from "react-leaflet-draw";
 import { useEffect, useRef } from "react";
 
 // Fix default marker icon paths (avoids 404s when leaflet is bundled)
