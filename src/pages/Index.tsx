@@ -1,92 +1,168 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Sidebar } from "@/components/aquascan/Sidebar";
+import { Sidebar, type SidebarTab } from "@/components/aquascan/Sidebar";
+import { SidePanel } from "@/components/aquascan/SidePanel";
 import { Header } from "@/components/aquascan/Header";
-import { AquaMap } from "@/components/aquascan/AquaMap";
+import { AquaMap, RECOMMENDED_ZONES, type DrawnPolygon, type LayerState } from "@/components/aquascan/AquaMap";
 import { LoadingOverlay } from "@/components/aquascan/LoadingOverlay";
 import { AnalysisPanel } from "@/components/aquascan/AnalysisPanel";
-import { MapHint, MapLegend, StatusStrip } from "@/components/aquascan/MapOverlays";
+import { MapHint, MapLegend, StatusStrip, ZonesBadge } from "@/components/aquascan/MapOverlays";
 import { CheckCircle2 } from "lucide-react";
 
+const SCENARIO_STEPS = [
+  "Deviating river flow…",
+  "Constructing primary wall…",
+  "Filling reservoir basin…",
+];
+
 const Index = () => {
+  const [tab, setTab] = useState<SidebarTab>("dashboard");
+  const [layers, setLayers] = useState<LayerState>({
+    waterEvolution: false,
+    sarUrban: false,
+    dem: false,
+  });
+
   const [analyzing, setAnalyzing] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
   const [reservoirBuilt, setReservoirBuilt] = useState(false);
+  const [reservoirTargetId, setReservoirTargetId] = useState<string | null>(null);
   const [areaKm2, setAreaKm2] = useState(0);
+  const [zoneName, setZoneName] = useState<string | undefined>(undefined);
   const [resetSignal, setResetSignal] = useState(0);
-  const [hasDrawn, setHasDrawn] = useState(false);
+  const [hasInteracted, setHasInteracted] = useState(false);
+
+  // Scenario simulation steps: 0 idle, 1-3 running, 4 done
+  const [scenarioStep, setScenarioStep] = useState(0);
+  const scenarioTimers = useRef<number[]>([]);
+  const pendingZoneRef = useRef<string | null>(null);
 
   useEffect(() => {
     document.title = "AquaScan — European Hydro-Intelligence Center";
+    return () => {
+      scenarioTimers.current.forEach((t) => window.clearTimeout(t));
+    };
   }, []);
 
-  const handlePolygonComplete = ({ areaKm2 }: { areaKm2: number }) => {
-    setHasDrawn(true);
+  const handlePolygonComplete = (p: DrawnPolygon) => {
+    setHasInteracted(true);
     setReservoirBuilt(false);
-    setAreaKm2(areaKm2);
+    setReservoirTargetId(null);
+    setAreaKm2(p.areaKm2);
+    pendingZoneRef.current = p.zoneId ?? null;
+    const z = p.zoneId ? RECOMMENDED_ZONES.find((r) => r.id === p.zoneId) : null;
+    setZoneName(z?.name ?? "Custom AOI · Drawn");
     setAnalyzing(true);
-    setTimeout(() => {
+    const t = window.setTimeout(() => {
       setAnalyzing(false);
       setPanelOpen(true);
-    }, 2000);
+    }, 1800);
+    scenarioTimers.current.push(t);
   };
 
-  const handleBuildReservoir = () => {
-    setPanelOpen(false);
-    setReservoirBuilt(true);
-    toast.success("Decision recorded in PostGIS Database", {
-      description: "Reservoir AOI persisted · intervention dispatched to ops queue.",
-      icon: <CheckCircle2 className="h-4 w-4 text-primary" />,
-      duration: 4500,
-    });
+  const handleZoneClickFromPanel = (id: string) => {
+    const z = RECOMMENDED_ZONES.find((r) => r.id === id);
+    if (!z) return;
+    // Approx area (rough)
+    const approxArea = 95 + Math.random() * 40;
+    pendingZoneRef.current = id;
+    setHasInteracted(true);
+    setReservoirBuilt(false);
+    setReservoirTargetId(null);
+    setAreaKm2(approxArea);
+    setZoneName(z.name);
+    setAnalyzing(true);
+    const t = window.setTimeout(() => {
+      setAnalyzing(false);
+      setPanelOpen(true);
+    }, 1800);
+    scenarioTimers.current.push(t);
   };
 
-  const handleDivertRiver = () => {
-    setPanelOpen(false);
-    toast.success("River diversion plan saved", {
-      description: "Hydrological model recalculating downstream impact…",
-      duration: 4000,
-    });
+  const handleToggleLayer = (k: keyof LayerState) => {
+    setLayers((s) => ({ ...s, [k]: !s[k] }));
+  };
+
+  const handleSimulate = () => {
+    setScenarioStep(1);
+    setTab("scenarios");
+    toast(SCENARIO_STEPS[0], { duration: 1400 });
+
+    const t1 = window.setTimeout(() => {
+      setScenarioStep(2);
+      toast(SCENARIO_STEPS[1], { duration: 1400 });
+    }, 1500);
+    const t2 = window.setTimeout(() => {
+      setScenarioStep(3);
+      toast(SCENARIO_STEPS[2], { duration: 1400 });
+    }, 3000);
+    const t3 = window.setTimeout(() => {
+      setReservoirTargetId(pendingZoneRef.current);
+      setReservoirBuilt(true);
+      setPanelOpen(false);
+      setScenarioStep(4);
+      toast.success("Reservoir successfully modeled", {
+        description: "PostGIS database updated · intervention dispatched.",
+        icon: <CheckCircle2 className="h-4 w-4 text-primary" />,
+        duration: 5000,
+      });
+    }, 4500);
+    const t4 = window.setTimeout(() => setScenarioStep(0), 9000);
+    scenarioTimers.current.push(t1, t2, t3, t4);
+  };
+
+  const handleNewAOI = () => {
+    setResetSignal((s) => s + 1);
+    setReservoirBuilt(false);
+    setReservoirTargetId(null);
+    setHasInteracted(false);
+    pendingZoneRef.current = null;
   };
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-background">
-      <Sidebar />
+      <Sidebar active={tab} onChange={setTab} />
+      <SidePanel
+        tab={tab}
+        layers={layers}
+        onToggleLayer={handleToggleLayer}
+        onZoneClick={handleZoneClickFromPanel}
+        scenarioStep={scenarioStep}
+      />
       <div className="relative flex flex-1 flex-col">
         <Header />
         <main className="relative flex-1 overflow-hidden">
           {/* Decorative grid + glow vignette */}
-          <div className="pointer-events-none absolute inset-0 z-[400] grid-overlay opacity-40 mix-blend-overlay" />
+          <div className="pointer-events-none absolute inset-0 z-[400] grid-overlay opacity-30 mix-blend-overlay" />
           <div className="pointer-events-none absolute inset-0 z-[400] bg-gradient-radial-glow" />
 
           <AquaMap
             onPolygonComplete={handlePolygonComplete}
             reservoirMode={reservoirBuilt}
+            reservoirTargetId={reservoirTargetId}
             onResetSignal={resetSignal}
+            layers={layers}
           />
 
-          <MapHint visible={!hasDrawn && !analyzing} />
-          <MapLegend />
+          <ZonesBadge />
+          <MapHint visible={!hasInteracted && !analyzing && scenarioStep === 0} />
+          <MapLegend layers={layers} />
           <StatusStrip />
 
           {analyzing && <LoadingOverlay />}
           {panelOpen && (
             <AnalysisPanel
               onClose={() => setPanelOpen(false)}
-              onBuildReservoir={handleBuildReservoir}
-              onDivertRiver={handleDivertRiver}
+              onSimulate={handleSimulate}
               area={areaKm2}
+              zoneName={zoneName}
+              scenarioStep={scenarioStep}
             />
           )}
 
-          {/* Reset / new AOI button after reservoir built */}
           {reservoirBuilt && (
             <button
-              onClick={() => {
-                setResetSignal((s) => s + 1);
-                setReservoirBuilt(false);
-                setHasDrawn(false);
-              }}
+              onClick={handleNewAOI}
               className="absolute right-5 top-5 z-[450] glass-panel rounded-full px-4 py-2 font-mono text-[10px] uppercase tracking-wider text-primary hover:shadow-glow-cyan transition-shadow"
             >
               + New AOI Analysis
