@@ -12,28 +12,28 @@ export function AnalysisPanel({ onClose, onSimulate, area, zoneName, scenarioSte
   const running = scenarioStep > 0 && scenarioStep < 4;
 
   return (
-    <aside className="absolute right-0 top-0 z-[450] flex h-full w-[400px] max-w-[92vw] animate-slide-in-right flex-col">
-      <div className="glass-panel m-3 flex flex-1 flex-col overflow-hidden rounded-2xl">
+    <aside className="absolute right-4 top-4 bottom-4 z-[1100] flex w-[400px] max-w-[calc(100vw-2rem)] animate-slide-in-right flex-col">
+      <div className="flex flex-1 flex-col overflow-hidden rounded-3xl border border-white/10 bg-black/40 shadow-2xl backdrop-blur-2xl">
         {/* Header */}
-        <div className="relative border-b border-border/60 bg-gradient-radial-glow px-5 py-4">
+        <div className="relative flex flex-col gap-2 border-b border-white/10 bg-gradient-radial-glow px-6 py-5">
           <button
             onClick={onClose}
             disabled={running}
-            className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-surface-elevated hover:text-foreground disabled:opacity-40"
+            className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-foreground/60 transition-colors hover:bg-white/10 hover:text-foreground disabled:opacity-40"
           >
             <X className="h-4 w-4" />
           </button>
           <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-primary text-glow-cyan">
             Earth Engine · Viability Analysis
           </p>
-          <h2 className="mt-1 text-lg font-semibold">
+          <h2 className="text-lg font-semibold leading-tight">
             {zoneName ?? "Custom AOI"}
           </h2>
-          <div className="mt-2 flex items-center gap-3 font-mono text-[11px] text-muted-foreground">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[10px] text-foreground/55">
             <span>{area.toFixed(1)} km²</span>
-            <span className="h-1 w-1 rounded-full bg-border" />
+            <span className="h-1 w-1 rounded-full bg-white/20" />
             <span>EPSG:4326</span>
-            <span className="h-1 w-1 rounded-full bg-border" />
+            <span className="h-1 w-1 rounded-full bg-white/20" />
             <span>UTC {new Date().toUTCString().slice(17, 22)}</span>
           </div>
         </div>
@@ -123,12 +123,12 @@ export function AnalysisPanel({ onClose, onSimulate, area, zoneName, scenarioSte
         </div>
 
         {/* Decision */}
-        <div className="border-t border-border/60 bg-surface/60 px-5 py-4">
-          <div className="grid grid-cols-2 gap-2.5">
+        <div className="border-t border-white/10 bg-black/30 px-6 py-5">
+          <div className="grid grid-cols-2 gap-3">
             <button
               onClick={onSimulate}
               disabled={running}
-              className="group relative flex items-center justify-center gap-2 overflow-hidden rounded-xl border border-primary/60 bg-primary/15 px-3 py-2.5 text-sm font-semibold text-primary transition-all hover:bg-primary/25 hover:shadow-glow-cyan disabled:opacity-60 disabled:cursor-wait"
+              className="group relative flex items-center justify-center gap-2 overflow-hidden rounded-2xl border border-primary/50 bg-primary/15 px-4 py-3 text-sm font-semibold text-primary transition-all hover:bg-primary/25 hover:shadow-glow-cyan disabled:cursor-wait disabled:opacity-60"
             >
               <Dam className="h-4 w-4" />
               {running ? "Simulating…" : "Simulate Dam"}
@@ -137,7 +137,7 @@ export function AnalysisPanel({ onClose, onSimulate, area, zoneName, scenarioSte
             <button
               onClick={onClose}
               disabled={running}
-              className="rounded-xl border border-border/60 bg-surface-elevated/60 px-3 py-2.5 text-sm font-medium text-foreground/80 transition-colors hover:bg-surface-elevated disabled:opacity-40"
+              className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-foreground/80 transition-colors hover:bg-white/10 disabled:opacity-40"
             >
               Cancel
             </button>

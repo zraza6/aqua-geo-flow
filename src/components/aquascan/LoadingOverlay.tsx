@@ -2,8 +2,8 @@ import { Satellite } from "lucide-react";
 
 export function LoadingOverlay({ label = "Fetching Earth Engine Data…" }: { label?: string }) {
   return (
-    <div className="pointer-events-none absolute inset-0 z-[500] flex items-center justify-center bg-background/40 backdrop-blur-sm animate-fade-in">
-      <div className="glass-panel flex flex-col items-center gap-4 rounded-xl px-8 py-6">
+    <div className="pointer-events-none absolute inset-0 z-[1200] flex items-center justify-center bg-black/30 backdrop-blur-sm animate-fade-in">
+      <div className="flex flex-col items-center gap-4 rounded-3xl border border-white/10 bg-black/40 px-8 py-6 shadow-2xl backdrop-blur-2xl">
         <div className="relative">
           <div className="absolute inset-0 animate-ping rounded-full bg-primary/40" />
           <div className="relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-cyan shadow-glow-cyan">
