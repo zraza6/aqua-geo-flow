@@ -1,7 +1,7 @@
-import { LayoutDashboard, Layers, TestTubes, Settings, Globe2 } from "lucide-react";
+import { LayoutDashboard, Layers, Globe2 } from "lucide-react";
 import { stopMapPropagation, GLASS } from "./stopMap";
 
-export type CommandTab = "dashboard" | "layers" | "scenarios" | "settings";
+export type CommandTab = "dashboard" | "layers";
 
 interface Props {
   active: CommandTab;
@@ -11,8 +11,6 @@ interface Props {
 const items: { id: CommandTab; icon: any; label: string }[] = [
   { id: "dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { id: "layers", icon: Layers, label: "Satellite Layers" },
-  { id: "scenarios", icon: TestTubes, label: "Scenarios" },
-  { id: "settings", icon: Settings, label: "Settings" },
 ];
 
 export function CommandHub({ active, onChange }: Props) {
