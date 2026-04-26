@@ -20,10 +20,9 @@ interface Props {
   tab: CommandTab;
   layers: LayerState;
   onToggleLayer: (k: keyof LayerState) => void;
-  onZoneClick: (id: string) => void;
 }
 
-export function ContextPanel({ tab, layers, onToggleLayer, onZoneClick }: Props) {
+export function ContextPanel({ tab, layers, onToggleLayer }: Props) {
   return (
     <aside
       className={`${GLASS} pointer-events-auto flex h-full w-72 flex-col overflow-hidden md:w-80`}
@@ -40,10 +39,8 @@ export function ContextPanel({ tab, layers, onToggleLayer, onZoneClick }: Props)
       <div className="no-scrollbar flex-1 overflow-y-auto p-5">
         {tab === "dashboard" && <Dashboard />}
         {tab === "layers" && (
-          <LayersPanel layers={layers} onToggleLayer={onToggleLayer} onZoneClick={onZoneClick} />
+          <LayersPanel layers={layers} onToggleLayer={onToggleLayer} />
         )}
-        {tab === "scenarios" && <ScenariosPanel onZoneClick={onZoneClick} />}
-        {tab === "settings" && <SettingsPanel />}
       </div>
     </aside>
   );
