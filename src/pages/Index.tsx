@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Sidebar } from "@/components/aquascan/Sidebar";
 import { Header } from "@/components/aquascan/Header";
