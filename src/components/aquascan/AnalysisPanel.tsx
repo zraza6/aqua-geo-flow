@@ -30,12 +30,10 @@ export function AnalysisPanel(props: Props) {
   }
   return (
     <aside
-      className="absolute right-3 top-20 bottom-3 z-[1100] flex w-[calc(100vw-1.5rem)] max-w-sm animate-[slide-in-right_0.5s_cubic-bezier(0.4,0,0.2,1)] flex-col sm:right-4 sm:top-24 sm:bottom-6 sm:w-96"
+      className="pointer-events-auto flex h-full w-[calc(100vw-7rem)] max-w-sm animate-[slide-in-right_0.4s_cubic-bezier(0.4,0,0.2,1)] flex-col overflow-hidden rounded-3xl border border-white/10 bg-slate-900/40 shadow-[0_8px_32px_rgba(0,0,0,0.4)] backdrop-blur-2xl"
       {...stopMapPropagation}
     >
-      <div className="flex flex-1 flex-col overflow-hidden rounded-3xl border border-white/10 bg-slate-900/40 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-2xl">
-        <PanelBody {...props} />
-      </div>
+      <PanelBody {...props} />
     </aside>
   );
 }
