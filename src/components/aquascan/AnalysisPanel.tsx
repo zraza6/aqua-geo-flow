@@ -1,14 +1,16 @@
-import { X, Droplets, Sprout, Users, AlertTriangle, Waves, Dam, GitBranch, ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { X, Mountain, CloudRain, Gauge, Dam, ArrowRight, ShieldCheck, Calendar } from "lucide-react";
 
 interface Props {
   onClose: () => void;
-  onBuildReservoir: () => void;
-  onDivertRiver: () => void;
-  area: number; // km²
+  onSimulate: () => void;
+  area: number;
+  zoneName?: string;
+  scenarioStep: number; // 0 idle, 1-3 running
 }
 
-export function AnalysisPanel({ onClose, onBuildReservoir, onDivertRiver, area }: Props) {
+export function AnalysisPanel({ onClose, onSimulate, area, zoneName, scenarioStep }: Props) {
+  const running = scenarioStep > 0 && scenarioStep < 4;
+
   return (
     <aside className="absolute right-0 top-0 z-[450] flex h-full w-[400px] max-w-[92vw] animate-slide-in-right flex-col">
       <div className="glass-panel m-3 flex flex-1 flex-col overflow-hidden rounded-2xl">
@@ -16,14 +18,17 @@ export function AnalysisPanel({ onClose, onBuildReservoir, onDivertRiver, area }
         <div className="relative border-b border-border/60 bg-gradient-radial-glow px-5 py-4">
           <button
             onClick={onClose}
-            className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-surface-elevated hover:text-foreground"
+            disabled={running}
+            className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-surface-elevated hover:text-foreground disabled:opacity-40"
           >
             <X className="h-4 w-4" />
           </button>
           <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-primary text-glow-cyan">
-            Region Analysis · Live
+            Earth Engine · Viability Analysis
           </p>
-          <h2 className="mt-1 text-lg font-semibold">Guadalquivir Basin · AOI-{Math.floor(Math.random() * 900 + 100)}</h2>
+          <h2 className="mt-1 text-lg font-semibold">
+            {zoneName ?? "Custom AOI"}
+          </h2>
           <div className="mt-2 flex items-center gap-3 font-mono text-[11px] text-muted-foreground">
             <span>{area.toFixed(1)} km²</span>
             <span className="h-1 w-1 rounded-full bg-border" />
@@ -33,202 +38,134 @@ export function AnalysisPanel({ onClose, onBuildReservoir, onDivertRiver, area }
           </div>
         </div>
 
-        {/* Body */}
         <div className="flex-1 space-y-4 overflow-y-auto px-5 py-4">
-          {/* NDVI */}
-          <Metric
-            icon={Sprout}
-            label="NDVI · Vegetation Health"
-            value="0.42"
-            sub="Moderate stress detected"
-            tone="success"
-          >
-            <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-surface-elevated">
-              <div
-                className="h-full rounded-full bg-gradient-vegetation shadow-[0_0_12px_hsl(140_80%_50%/0.5)]"
-                style={{ width: "42%" }}
-              />
-            </div>
-            <div className="mt-1 flex justify-between font-mono text-[9px] text-muted-foreground">
-              <span>0.0 BARE</span>
-              <span>1.0 DENSE</span>
-            </div>
-          </Metric>
-
-          {/* Soil Moisture */}
-          <Metric
-            icon={Droplets}
-            label="Soil Moisture · SMAP L4"
-            value="14%"
-            sub="CRITICAL · Below 20% threshold"
-            tone="warning"
-          >
-            <div className="mt-2 grid grid-cols-10 gap-1">
-              {Array.from({ length: 10 }).map((_, i) => (
-                <div
-                  key={i}
-                  className={`h-1.5 rounded-full ${
-                    i < 1.4 ? "bg-warning shadow-[0_0_8px_hsl(var(--warning)/0.6)]" : "bg-surface-elevated"
-                  }`}
-                />
-              ))}
-            </div>
-          </Metric>
-
-          {/* Water Demand donut */}
-          <Metric
-            icon={Users}
-            label="Human Water Demand"
-            value=""
-            sub="3.2M residents in catchment"
-            tone="alert"
-          >
-            <div className="mt-1 flex items-center gap-4">
-              <Donut percent={92} />
-              <div className="flex-1 space-y-1.5 font-mono text-[10px]">
-                <Row dot="bg-alert" label="Demand" v="92%" />
-                <Row dot="bg-primary" label="Available" v="8%" />
-                <Row dot="bg-muted" label="Reserve" v="0%" />
-              </div>
-            </div>
-          </Metric>
-
-          {/* Risk score */}
-          <div className="rounded-xl border border-alert/40 bg-alert/5 p-4 shadow-[inset_0_0_30px_hsl(var(--alert)/0.08)]">
+          {/* Viability score */}
+          <div className="rounded-xl border border-success/40 bg-success/5 p-4 shadow-[inset_0_0_30px_hsl(var(--success)/0.08)]">
             <div className="flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 text-alert" />
-              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-alert text-glow-alert">
-                Overall Risk Score
+              <Gauge className="h-4 w-4 text-success" />
+              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-success">
+                Viability Score
               </p>
             </div>
             <div className="mt-1 flex items-baseline gap-3">
-              <span className="text-4xl font-bold text-alert text-glow-alert">85%</span>
-              <span className="font-mono text-xs uppercase tracking-wider text-alert">CRITICAL</span>
+              <span className="text-4xl font-bold text-success" style={{ textShadow: "0 0 12px hsl(var(--success) / 0.6)" }}>
+                88%
+              </span>
+              <span className="font-mono text-xs uppercase tracking-wider text-success">
+                Highly Recommended
+              </span>
             </div>
             <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-surface-elevated">
               <div
-                className="h-full bg-gradient-alert shadow-glow-alert"
-                style={{ width: "85%" }}
+                className="h-full rounded-full bg-gradient-to-r from-success to-primary"
+                style={{ width: "88%", boxShadow: "0 0 12px hsl(var(--success)/0.6)" }}
               />
             </div>
             <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
-              Combined drought, demand and vegetation indices exceed the EU EDO emergency
-              threshold. Immediate intervention recommended.
+              Composite of DEM slope, NDWI water proximity, SAR urban exclusion and ERA5 precipitation forecast.
             </p>
+          </div>
+
+          {/* DEM */}
+          <Section icon={Mountain} title="DEM Analysis" tone="warning">
+            <p className="text-[12px] text-foreground/90">
+              Ideal <span className="font-semibold text-warning">steep valley profile</span> detected.
+            </p>
+            <div className="mt-2 grid grid-cols-3 gap-2">
+              <Stat label="Mean slope" value="14.2°" />
+              <Stat label="Δ Elevation" value="312 m" />
+              <Stat label="Catchment" value="184 km²" />
+            </div>
+            {/* Mock terrain svg */}
+            <svg viewBox="0 0 200 50" className="mt-3 h-12 w-full">
+              <defs>
+                <linearGradient id="terrain" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stopColor="hsl(var(--warning))" stopOpacity="0.6" />
+                  <stop offset="100%" stopColor="hsl(var(--warning))" stopOpacity="0" />
+                </linearGradient>
+              </defs>
+              <path d="M0,40 L20,32 L40,18 L60,8 L80,22 L100,12 L120,28 L140,16 L160,30 L180,22 L200,38 L200,50 L0,50 Z" fill="url(#terrain)" />
+              <path d="M0,40 L20,32 L40,18 L60,8 L80,22 L100,12 L120,28 L140,16 L160,30 L180,22 L200,38" fill="none" stroke="hsl(var(--warning))" strokeWidth="1.2" />
+            </svg>
+          </Section>
+
+          {/* Weather */}
+          <Section icon={CloudRain} title="Weather Context · 72h Forecast" tone="primary">
+            <p className="text-[12px] text-foreground/90">
+              <span className="font-semibold text-primary">Heavy precipitation (+40 mm)</span> expected.
+              Ideal window for water capture simulation.
+            </p>
+            <div className="mt-2 flex items-end justify-between gap-1">
+              {[6, 12, 22, 18, 28, 32, 26].map((v, i) => (
+                <div key={i} className="flex flex-1 flex-col items-center gap-1">
+                  <div
+                    className="w-full rounded-t bg-gradient-to-t from-primary/30 to-primary"
+                    style={{ height: `${v * 1.4}px`, boxShadow: "0 0 8px hsl(var(--primary)/0.4)" }}
+                  />
+                  <span className="font-mono text-[8px] text-muted-foreground">{v}mm</span>
+                </div>
+              ))}
+            </div>
+            <div className="mt-2 flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-wider text-muted-foreground">
+              <Calendar className="h-3 w-3" />
+              <span>Strictly short-term · long-range forecasts excluded (unpredictable)</span>
+            </div>
+          </Section>
+
+          {/* Confidence */}
+          <div className="flex items-center gap-2 rounded-lg border border-border/50 bg-surface-elevated/40 px-3 py-2">
+            <ShieldCheck className="h-3.5 w-3.5 text-primary" />
+            <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              Model confidence
+            </span>
+            <span className="ml-auto font-mono text-[11px] font-semibold text-primary">93.4%</span>
           </div>
         </div>
 
-        {/* Decision Engine */}
+        {/* Decision */}
         <div className="border-t border-border/60 bg-surface/60 px-5 py-4">
-          <div className="mb-3 flex items-center gap-2">
-            <Waves className="h-3.5 w-3.5 text-primary" />
-            <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-primary">
-              Infrastructure Intervention
-            </p>
-          </div>
           <div className="grid grid-cols-2 gap-2.5">
-            <ActionButton
-              icon={Dam}
-              label="Build Reservoir"
-              hint="Impound flow"
-              onClick={onBuildReservoir}
-              primary
-            />
-            <ActionButton
-              icon={GitBranch}
-              label="Divert River"
-              hint="Re-route channel"
-              onClick={onDivertRiver}
-            />
+            <button
+              onClick={onSimulate}
+              disabled={running}
+              className="group relative flex items-center justify-center gap-2 overflow-hidden rounded-xl border border-primary/60 bg-primary/15 px-3 py-2.5 text-sm font-semibold text-primary transition-all hover:bg-primary/25 hover:shadow-glow-cyan disabled:opacity-60 disabled:cursor-wait"
+            >
+              <Dam className="h-4 w-4" />
+              {running ? "Simulating…" : "Simulate Dam"}
+              {!running && <ArrowRight className="h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />}
+            </button>
+            <button
+              onClick={onClose}
+              disabled={running}
+              className="rounded-xl border border-border/60 bg-surface-elevated/60 px-3 py-2.5 text-sm font-medium text-foreground/80 transition-colors hover:bg-surface-elevated disabled:opacity-40"
+            >
+              Cancel
+            </button>
           </div>
-          <button className="mt-2 flex w-full items-center justify-center gap-1 py-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground hover:text-primary transition-colors">
-            View full DSE report <ArrowRight className="h-3 w-3" />
-          </button>
         </div>
       </div>
     </aside>
   );
 }
 
-function Metric({
-  icon: Icon, label, value, sub, tone, children,
-}: {
-  icon: any; label: string; value: string; sub: string;
-  tone: "success" | "warning" | "alert"; children?: React.ReactNode;
-}) {
-  const toneCls = {
-    success: "text-success",
-    warning: "text-warning",
-    alert: "text-alert",
-  }[tone];
+function Section({ icon: Icon, title, tone, children }: { icon: any; title: string; tone: "warning" | "primary"; children: React.ReactNode }) {
+  const c = tone === "warning" ? "text-warning" : "text-primary";
   return (
     <div className="rounded-xl border border-border/50 bg-surface-elevated/40 p-3.5">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Icon className={`h-3.5 w-3.5 ${toneCls}`} />
-          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-            {label}
-          </p>
-        </div>
-        {value && <span className={`font-mono text-sm font-semibold ${toneCls}`}>{value}</span>}
+      <div className="mb-1 flex items-center gap-2">
+        <Icon className={`h-3.5 w-3.5 ${c}`} />
+        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{title}</p>
       </div>
-      <p className={`mt-0.5 text-[11px] ${toneCls}`}>{sub}</p>
       {children}
     </div>
   );
 }
 
-function Row({ dot, label, v }: { dot: string; label: string; v: string }) {
+function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-1.5">
-        <span className={`h-1.5 w-1.5 rounded-full ${dot}`} />
-        <span className="text-muted-foreground">{label}</span>
-      </div>
-      <span className="font-semibold text-foreground">{v}</span>
+    <div className="rounded-md border border-border/40 bg-surface/40 px-2 py-1.5">
+      <p className="font-mono text-[8px] uppercase tracking-wider text-muted-foreground">{label}</p>
+      <p className="text-[12px] font-semibold text-foreground">{value}</p>
     </div>
-  );
-}
-
-function Donut({ percent }: { percent: number }) {
-  const r = 28;
-  const c = 2 * Math.PI * r;
-  const offset = c - (percent / 100) * c;
-  return (
-    <div className="relative h-20 w-20 shrink-0">
-      <svg viewBox="0 0 72 72" className="h-full w-full -rotate-90">
-        <circle cx="36" cy="36" r={r} fill="none" stroke="hsl(var(--surface-elevated))" strokeWidth="7" />
-        <circle
-          cx="36" cy="36" r={r} fill="none"
-          stroke="hsl(var(--alert))" strokeWidth="7" strokeLinecap="round"
-          strokeDasharray={c} strokeDashoffset={offset}
-          style={{ filter: "drop-shadow(0 0 6px hsl(var(--alert) / 0.6))" }}
-        />
-      </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-lg font-bold text-alert">{percent}%</span>
-        <span className="font-mono text-[8px] uppercase tracking-wider text-muted-foreground">Demand</span>
-      </div>
-    </div>
-  );
-}
-
-function ActionButton({
-  icon: Icon, label, hint, onClick, primary,
-}: { icon: any; label: string; hint: string; onClick: () => void; primary?: boolean }) {
-  return (
-    <button
-      onClick={onClick}
-      className={`group relative flex flex-col items-start gap-1 overflow-hidden rounded-xl border p-3 text-left transition-all duration-200 ${
-        primary
-          ? "border-primary/50 bg-primary/10 hover:bg-primary/20 hover:shadow-glow-cyan"
-          : "border-border/60 bg-surface-elevated/60 hover:border-primary/40 hover:bg-surface-elevated"
-      }`}
-    >
-      <Icon className={`h-4 w-4 ${primary ? "text-primary" : "text-foreground"}`} strokeWidth={1.75} />
-      <span className={`text-sm font-semibold ${primary ? "text-primary" : "text-foreground"}`}>{label}</span>
-      <span className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground">{hint}</span>
-      <ArrowRight className={`absolute right-2 bottom-2 h-3 w-3 opacity-0 transition-all group-hover:opacity-100 group-hover:translate-x-0.5 ${primary ? "text-primary" : "text-foreground"}`} />
-    </button>
   );
 }
