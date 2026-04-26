@@ -16,6 +16,10 @@ const Index = () => {
   const [resetSignal, setResetSignal] = useState(0);
   const [hasDrawn, setHasDrawn] = useState(false);
 
+  useEffect(() => {
+    document.title = "AquaScan — European Hydro-Intelligence Center";
+  }, []);
+
   const handlePolygonComplete = ({ areaKm2 }: { areaKm2: number }) => {
     setHasDrawn(true);
     setReservoirBuilt(false);
