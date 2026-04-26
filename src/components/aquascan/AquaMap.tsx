@@ -104,16 +104,58 @@ function MapTuning() {
   return null;
 }
 
-export function AquaMap({
-  onPolygonComplete,
-  reservoirMode,
-  reservoirTargetId,
-  onResetSignal,
-  layers,
-}: Props) {
+/** Bridges an external ref to internal Leaflet draw API. */
+function DrawBridge({ onReady }: { onReady: (start: () => void) => void }) {
+  const map = useMap();
+  useEffect(() => {
+    const start = () => {
+      const drawer = new (L as any).Draw.Polygon(map, {
+        allowIntersection: false,
+        showArea: true,
+        shapeOptions: {
+          color: "#22d3ee",
+          weight: 2,
+          dashArray: "6 4",
+          fillColor: "#22d3ee",
+          fillOpacity: 0.15,
+        },
+      });
+      drawer.enable();
+    };
+    onReady(start);
+  }, [map, onReady]);
+  return null;
+}
+
+export const AquaMap = forwardRef<AquaMapHandle, Props>(function AquaMap(
+  {
+    onPolygonComplete,
+    reservoirMode,
+    reservoirTargetId,
+    onResetSignal,
+    layers,
+    onOpenLayers,
+  },
+  ref,
+) {
   const fgRef = useRef<L.FeatureGroup | null>(null);
   const lastLayerRef = useRef<L.Polygon | null>(null);
   const recommendedRefs = useRef<Record<string, L.Polygon | null>>({});
+  const startDrawRef = useRef<(() => void) | null>(null);
+
+  useImperativeHandle(ref, () => ({
+    startDraw: () => startDrawRef.current?.(),
+  }));
+
+  const recommendedStyle = useMemo<L.PathOptions>(
+    () => ({
+      color: "#fbbf24",
+      weight: 3,
+      fillColor: "#fde047",
+      fillOpacity: 0.2,
+    }),
+    [],
+  );
 
   // Restyle drawn polygon when reservoir built
   useEffect(() => {
@@ -123,10 +165,10 @@ export function AquaMap({
       lastLayerRef.current;
     if (target) {
       target.setStyle({
-        color: "#38bdf8",
+        color: "#0284c7",
         weight: 2,
-        fillColor: "#0c4a6e",
-        fillOpacity: 0.7,
+        fillColor: "#0ea5e9",
+        fillOpacity: 0.6,
         dashArray: undefined,
       });
     }
@@ -136,31 +178,23 @@ export function AquaMap({
     if (onResetSignal > 0 && fgRef.current) {
       fgRef.current.clearLayers();
       lastLayerRef.current = null;
-      // Reset recommended zone styles
       Object.values(recommendedRefs.current).forEach((p) => {
         p?.setStyle(recommendedStyle);
       });
     }
-  }, [onResetSignal]);
-
-  const recommendedStyle = useMemo<L.PathOptions>(() => ({
-    color: "#fbbf24",
-    weight: 2.5,
-    dashArray: "4 4",
-    fillColor: "#fde047",
-    fillOpacity: 0.18,
-  }), []);
+  }, [onResetSignal, recommendedStyle]);
 
   return (
     <MapContainer
       center={[37.55, -4.2]}
       zoom={7}
       minZoom={3}
-      zoomControl={true}
+      zoomControl={false}
       className="h-full w-full z-0"
       worldCopyJump
     >
       <MapTuning />
+      <DrawBridge onReady={(s) => (startDrawRef.current = s)} />
 
       {/* Topographic base — reveals rivers + elevation contours */}
       <TileLayer
@@ -169,44 +203,58 @@ export function AquaMap({
         maxZoom={17}
       />
 
-      {/* Recommended Zones (always visible, styled gold) */}
-      {RECOMMENDED_ZONES.map((z) => {
-        const isReservoir = reservoirMode && reservoirTargetId === z.id;
-        return (
-          <Polygon
-            key={z.id}
-            positions={z.coords}
-            ref={(r) => { recommendedRefs.current[z.id] = r as unknown as L.Polygon | null; }}
-            pathOptions={
-              isReservoir
-                ? { color: "#38bdf8", weight: 2, fillColor: "#0c4a6e", fillOpacity: 0.7 }
-                : recommendedStyle
-            }
-            eventHandlers={{
-              click: (e) => {
-                const layer = e.target as L.Polygon;
-                const latlngs = layer.getLatLngs()[0] as L.LatLng[];
-                const area = polygonAreaKm2(latlngs);
-                onPolygonComplete({ layer, areaKm2: area, source: "recommended", zoneId: z.id });
-              },
-              mouseover: (e) => {
-                const l = e.target as L.Polygon;
-                if (!(reservoirMode && reservoirTargetId === z.id)) {
-                  l.setStyle({ fillOpacity: 0.32, weight: 3 });
-                }
-              },
-              mouseout: (e) => {
-                const l = e.target as L.Polygon;
-                if (!(reservoirMode && reservoirTargetId === z.id)) {
-                  l.setStyle(recommendedStyle);
-                }
-              },
-            }}
-          />
-        );
-      })}
+      {/* DEM Hotspot Zones */}
+      {layers.dem &&
+        RECOMMENDED_ZONES.map((z) => {
+          const isReservoir = reservoirMode && reservoirTargetId === z.id;
+          return (
+            <Polygon
+              key={z.id}
+              positions={z.coords}
+              ref={(r) => {
+                recommendedRefs.current[z.id] = r as unknown as L.Polygon | null;
+              }}
+              pathOptions={
+                isReservoir
+                  ? { color: "#0284c7", weight: 2, fillColor: "#0ea5e9", fillOpacity: 0.6 }
+                  : recommendedStyle
+              }
+              eventHandlers={{
+                click: (e) => {
+                  const layer = e.target as L.Polygon;
+                  const latlngs = layer.getLatLngs()[0] as L.LatLng[];
+                  const area = polygonAreaKm2(latlngs);
+                  onPolygonComplete({
+                    layer,
+                    areaKm2: area,
+                    source: "recommended",
+                    zoneId: z.id,
+                  });
+                },
+                mouseover: (e) => {
+                  const l = e.target as L.Polygon;
+                  if (!(reservoirMode && reservoirTargetId === z.id)) {
+                    l.setStyle({ fillOpacity: 0.35, weight: 4 });
+                  }
+                },
+                mouseout: (e) => {
+                  const l = e.target as L.Polygon;
+                  if (!(reservoirMode && reservoirTargetId === z.id)) {
+                    l.setStyle(recommendedStyle);
+                  }
+                },
+              }}
+            >
+              <Tooltip direction="top" offset={[0, -8]} opacity={1} sticky>
+                <span className="font-mono text-[10px] uppercase tracking-wider">
+                  High Potential Elevation Zone (DEM)
+                </span>
+              </Tooltip>
+            </Polygon>
+          );
+        })}
 
-      {/* Sentinel Water Evolution — blue heatmap dots along rivers */}
+      {/* Sentinel Water Evolution */}
       {layers.waterEvolution &&
         RIVER_HEATMAP.map((pt, i) => (
           <CircleMarker
@@ -236,7 +284,7 @@ export function AquaMap({
           />
         ))}
 
-      {/* SAR Urban Footprint — red grid rectangles (do NOT flood) */}
+      {/* SAR Urban Footprint */}
       {layers.sarUrban &&
         URBAN_FOOTPRINTS.map((u) => (
           <Rectangle
@@ -249,10 +297,21 @@ export function AquaMap({
               fillColor: "#ef4444",
               fillOpacity: 0.22,
             }}
-          />
+          >
+            <Tooltip direction="center" opacity={0.9} permanent={false}>
+              <span className="font-mono text-[10px] uppercase tracking-wider text-rose-300">
+                SAR · {u.name} · No-flood
+              </span>
+            </Tooltip>
+          </Rectangle>
         ))}
 
-      <FeatureGroup ref={(r) => { fgRef.current = r as unknown as L.FeatureGroup; }}>
+      <FeatureGroup
+        ref={(r) => {
+          fgRef.current = r as unknown as L.FeatureGroup;
+        }}
+      >
+        {/* Hidden EditControl — FAB triggers drawing instead */}
         <EditControl
           position="topright"
           onCreated={(e: any) => {
@@ -265,7 +324,7 @@ export function AquaMap({
               fillOpacity: 0.15,
             });
             lastLayerRef.current = layer;
-            const latlngs = (layer.getLatLngs()[0] as L.LatLng[]);
+            const latlngs = layer.getLatLngs()[0] as L.LatLng[];
             const area = polygonAreaKm2(latlngs);
             onPolygonComplete({ layer, areaKm2: area, source: "drawn" });
           }}
@@ -275,21 +334,17 @@ export function AquaMap({
             circlemarker: false,
             marker: false,
             polyline: false,
-            polygon: {
-              allowIntersection: false,
-              showArea: true,
-              shapeOptions: {
-                color: "#22d3ee",
-                weight: 2,
-                dashArray: "6 4",
-                fillColor: "#22d3ee",
-                fillOpacity: 0.15,
-              },
-            },
+            polygon: false,
           }}
-          edit={{ edit: false, remove: true }}
+          edit={{ edit: false, remove: false }}
         />
       </FeatureGroup>
+
+      <MapFabsInner
+        onOpenLayers={onOpenLayers}
+        onStartDraw={() => startDrawRef.current?.()}
+      />
     </MapContainer>
   );
-}
+});
+
