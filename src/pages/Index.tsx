@@ -2,11 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Sidebar, type SidebarTab } from "@/components/aquascan/Sidebar";
 import { SidePanel } from "@/components/aquascan/SidePanel";
-import { Header } from "@/components/aquascan/Header";
 import { AquaMap, RECOMMENDED_ZONES, type DrawnPolygon, type LayerState } from "@/components/aquascan/AquaMap";
 import { LoadingOverlay } from "@/components/aquascan/LoadingOverlay";
 import { AnalysisPanel } from "@/components/aquascan/AnalysisPanel";
-import { MapHint, MapLegend, StatusStrip, ZonesBadge } from "@/components/aquascan/MapOverlays";
+import { MapHint, MapLegend, StatusStrip, ZonesBadge, TopBrand } from "@/components/aquascan/MapOverlays";
 import { CheckCircle2 } from "lucide-react";
 
 const SCENARIO_STEPS = [
@@ -20,7 +19,6 @@ const Index = () => {
   const [layers, setLayers] = useState<LayerState>({
     waterEvolution: false,
     sarUrban: false,
-    dem: false,
   });
 
   const [analyzing, setAnalyzing] = useState(false);
@@ -32,7 +30,6 @@ const Index = () => {
   const [resetSignal, setResetSignal] = useState(0);
   const [hasInteracted, setHasInteracted] = useState(false);
 
-  // Scenario simulation steps: 0 idle, 1-3 running, 4 done
   const [scenarioStep, setScenarioStep] = useState(0);
   const scenarioTimers = useRef<number[]>([]);
   const pendingZoneRef = useRef<string | null>(null);
@@ -63,7 +60,6 @@ const Index = () => {
   const handleZoneClickFromPanel = (id: string) => {
     const z = RECOMMENDED_ZONES.find((r) => r.id === id);
     if (!z) return;
-    // Approx area (rough)
     const approxArea = 95 + Math.random() * 40;
     pendingZoneRef.current = id;
     setHasInteracted(true);
@@ -120,56 +116,68 @@ const Index = () => {
   };
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-background">
-      <Sidebar active={tab} onChange={setTab} />
-      <SidePanel
-        tab={tab}
-        layers={layers}
-        onToggleLayer={handleToggleLayer}
-        onZoneClick={handleZoneClickFromPanel}
-        scenarioStep={scenarioStep}
-      />
-      <div className="relative flex flex-1 flex-col">
-        <Header />
-        <main className="relative flex-1 overflow-hidden">
-          {/* Decorative grid + glow vignette */}
-          <div className="pointer-events-none absolute inset-0 z-[400] grid-overlay opacity-30 mix-blend-overlay" />
-          <div className="pointer-events-none absolute inset-0 z-[400] bg-gradient-radial-glow" />
-
-          <AquaMap
-            onPolygonComplete={handlePolygonComplete}
-            reservoirMode={reservoirBuilt}
-            reservoirTargetId={reservoirTargetId}
-            onResetSignal={resetSignal}
-            layers={layers}
-          />
-
-          <ZonesBadge />
-          <MapHint visible={!hasInteracted && !analyzing && scenarioStep === 0} />
-          <MapLegend layers={layers} />
-          <StatusStrip />
-
-          {analyzing && <LoadingOverlay />}
-          {panelOpen && (
-            <AnalysisPanel
-              onClose={() => setPanelOpen(false)}
-              onSimulate={handleSimulate}
-              area={areaKm2}
-              zoneName={zoneName}
-              scenarioStep={scenarioStep}
-            />
-          )}
-
-          {reservoirBuilt && (
-            <button
-              onClick={handleNewAOI}
-              className="absolute right-5 top-5 z-[450] glass-panel rounded-full px-4 py-2 font-mono text-[10px] uppercase tracking-wider text-primary hover:shadow-glow-cyan transition-shadow"
-            >
-              + New AOI Analysis
-            </button>
-          )}
-        </main>
+    <div className="relative h-screen w-screen overflow-hidden bg-background">
+      {/* MAP – full bleed underneath everything */}
+      <div className="absolute inset-0 z-0">
+        <AquaMap
+          onPolygonComplete={handlePolygonComplete}
+          reservoirMode={reservoirBuilt}
+          reservoirTargetId={reservoirTargetId}
+          onResetSignal={resetSignal}
+          layers={layers}
+        />
       </div>
+
+      {/* Decorative grid + glow vignette over map but under panels */}
+      <div className="pointer-events-none absolute inset-0 z-[5] grid-overlay opacity-20 mix-blend-overlay" />
+      <div className="pointer-events-none absolute inset-0 z-[5] bg-gradient-radial-glow opacity-60" />
+
+      {/* TOP BRAND BAR (floating) */}
+      <TopBrand />
+
+      {/* FLOATING LEFT SIDEBAR (icons) */}
+      <div className="absolute left-4 top-1/2 z-[1000] -translate-y-1/2">
+        <Sidebar active={tab} onChange={setTab} />
+      </div>
+
+      {/* FLOATING LEFT CONTEXT PANEL */}
+      <div className="absolute left-24 top-20 bottom-20 z-[1000] w-[320px] max-w-[calc(100vw-7rem)]">
+        <SidePanel
+          tab={tab}
+          layers={layers}
+          onToggleLayer={handleToggleLayer}
+          onZoneClick={handleZoneClickFromPanel}
+          scenarioStep={scenarioStep}
+        />
+      </div>
+
+      {/* FLOATING OVERLAYS */}
+      <ZonesBadge />
+      <MapHint visible={!hasInteracted && !analyzing && scenarioStep === 0} />
+      <MapLegend layers={layers} />
+      <StatusStrip />
+
+      {analyzing && <LoadingOverlay />}
+
+      {/* RIGHT GLASS PANEL – only when AOI selected */}
+      {panelOpen && (
+        <AnalysisPanel
+          onClose={() => setPanelOpen(false)}
+          onSimulate={handleSimulate}
+          area={areaKm2}
+          zoneName={zoneName}
+          scenarioStep={scenarioStep}
+        />
+      )}
+
+      {reservoirBuilt && (
+        <button
+          onClick={handleNewAOI}
+          className="absolute right-6 top-6 z-[1100] rounded-full border border-white/15 bg-black/40 px-5 py-2.5 font-mono text-[10px] uppercase tracking-[0.2em] text-primary backdrop-blur-xl transition-all hover:border-primary/50 hover:shadow-glow-cyan"
+        >
+          + New AOI Analysis
+        </button>
+      )}
     </div>
   );
 };
