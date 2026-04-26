@@ -19,9 +19,27 @@ export default {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        surface: {
+          DEFAULT: "hsl(var(--surface))",
+          elevated: "hsl(var(--surface-elevated))",
+        },
+        alert: {
+          DEFAULT: "hsl(var(--alert))",
+          foreground: "hsl(var(--alert-foreground))",
+          glow: "hsl(var(--alert-glow))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
+        },
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+        },
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
+          glow: "hsl(var(--primary-glow))",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -84,6 +102,25 @@ export default {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "slide-in-right": "slide-in-right 0.5s var(--ease-smooth)",
+        "slide-out-right": "slide-out-right 0.4s var(--ease-smooth)",
+        "fade-in": "fade-in 0.4s var(--ease-smooth)",
+        "pulse-glow": "pulse-glow 2s ease-out infinite",
+      },
+      backgroundImage: {
+        "gradient-cyan": "var(--gradient-cyan)",
+        "gradient-alert": "var(--gradient-alert)",
+        "gradient-vegetation": "var(--gradient-vegetation)",
+        "gradient-surface": "var(--gradient-surface)",
+        "gradient-radial-glow": "var(--gradient-radial-glow)",
+      },
+      boxShadow: {
+        "glow-cyan": "var(--shadow-glow-cyan)",
+        "glow-alert": "var(--shadow-glow-alert)",
+        "panel": "var(--shadow-panel)",
+      },
+      fontFamily: {
+        mono: ["'JetBrains Mono'", "ui-monospace", "monospace"],
       },
     },
   },
