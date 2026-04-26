@@ -1,8 +1,9 @@
-import { MapContainer, TileLayer, FeatureGroup, useMap, Polygon, Rectangle, CircleMarker } from "react-leaflet";
+import { MapContainer, TileLayer, FeatureGroup, useMap, Polygon, Rectangle, CircleMarker, Tooltip } from "react-leaflet";
 import L from "leaflet";
 import "leaflet-draw"; // side-effect: registers L.Draw on the global L
 import { EditControl } from "react-leaflet-draw";
-import { useEffect, useMemo, useRef } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef } from "react";
+import { MapFabsInner } from "./MapFabs";
 
 // Fix default marker icon paths
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -22,6 +23,11 @@ export interface DrawnPolygon {
 export interface LayerState {
   waterEvolution: boolean;
   sarUrban: boolean;
+  dem: boolean;
+}
+
+export interface AquaMapHandle {
+  startDraw: () => void;
 }
 
 interface Props {
@@ -30,6 +36,7 @@ interface Props {
   reservoirTargetId: string | null;
   onResetSignal: number;
   layers: LayerState;
+  onOpenLayers: () => void;
 }
 
 // --- Mock geo data --------------------------------------------------
