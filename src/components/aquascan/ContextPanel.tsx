@@ -179,7 +179,12 @@ function LayersPanel({
   onToggleLayer: (k: keyof LayerState) => void;
 }) {
   const [vp, setVp] = useState(viewportBus.get());
-  useEffect(() => viewportBus.subscribe(setVp), []);
+  useEffect(() => {
+    const unsub = viewportBus.subscribe(setVp);
+    return () => {
+      unsub();
+    };
+  }, []);
 
   const fmt = (n: number) =>
     `${n >= 0 ? "+" : "−"}${Math.abs(n).toFixed(4)}°`;
