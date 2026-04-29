@@ -139,7 +139,7 @@ export function AnalysisPanel({
       {...stopMapPropagation}
     >
       {/* Header */}
-      <div className="relative flex flex-col gap-2 border-b border-white/10 px-8 py-6">
+      <div className="relative flex flex-col gap-2 border-b border-white/10 px-10 py-7">
         <button
           onClick={onClose}
           disabled={running}
