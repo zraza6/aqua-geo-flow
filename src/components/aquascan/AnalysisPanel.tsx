@@ -165,7 +165,7 @@ export function AnalysisPanel({
         </div>
       </div>
 
-      <div className="no-scrollbar min-h-0 flex-1 overflow-y-auto px-8 py-6">
+      <div className="no-scrollbar min-h-0 flex-1 overflow-y-auto px-10 py-8">
         {/* === MODE 1 — LOCATION INFO (always visible header card) === */}
         <div className="mb-6 rounded-2xl border border-cyan-400/20 bg-cyan-400/[0.04] p-5">
           <div className="mb-4 flex items-center gap-2">
