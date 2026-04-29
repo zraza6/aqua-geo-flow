@@ -157,6 +157,7 @@ const Index = () => {
           <AquaMap
             ref={mapRef}
             onPolygonComplete={handlePolygonComplete}
+            onAreaChange={handleAreaChange}
             onOpenLayers={() => {
               setActiveSidebarTab("layers");
               setShowContext(true);
