@@ -358,7 +358,7 @@ export const MarketingSections = () => {
           {...fadeUp}
           className="text-4xl font-semibold text-white/90 text-center mb-4 tracking-tight"
         >
-          AquaScan Interface. HeavyWater Engine.
+          Aqua Scan <span className="text-cyan-400">Pro</span> Interface. HeavyWater Engine.
         </motion.h2>
         <motion.p
           {...fadeUp}
