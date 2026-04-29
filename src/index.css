@@ -96,18 +96,18 @@
     font-feature-settings: "ss01", "cv11";
   }
 
-  /* Global premium scrollbar — applied app-wide */
+  /* Global dark ultra-thin scrollbar — prevents default white browser rails */
   * {
     scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+    scrollbar-color: hsl(188 95% 55% / 0.18) transparent;
   }
-  *::-webkit-scrollbar { width: 6px; height: 6px; }
+  *::-webkit-scrollbar { width: 4px; height: 4px; }
   *::-webkit-scrollbar-track { background: transparent; }
   *::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
+    background: hsl(188 95% 55% / 0.18);
+    border-radius: 9999px;
   }
-  *::-webkit-scrollbar-thumb:hover { background: rgba(34, 211, 238, 0.3); }
+  *::-webkit-scrollbar-thumb:hover { background: hsl(188 95% 55% / 0.35); }
   *::-webkit-scrollbar-corner { background: transparent; }
 }
 
@@ -247,8 +247,8 @@
 .no-scrollbar::-webkit-scrollbar { display: none; }
 
 /* Premium thin dark scrollbar */
-.dark-scrollbar { scrollbar-width: thin; scrollbar-color: rgba(34,211,238,0.18) transparent; }
+.dark-scrollbar { scrollbar-width: thin; scrollbar-color: hsl(188 95% 55% / 0.18) transparent; }
 .dark-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
 .dark-scrollbar::-webkit-scrollbar-track { background: transparent; }
-.dark-scrollbar::-webkit-scrollbar-thumb { background: rgba(34,211,238,0.18); border-radius: 9999px; }
-.dark-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(34,211,238,0.35); }
+.dark-scrollbar::-webkit-scrollbar-thumb { background: hsl(188 95% 55% / 0.18); border-radius: 9999px; }
+.dark-scrollbar::-webkit-scrollbar-thumb:hover { background: hsl(188 95% 55% / 0.35); }
