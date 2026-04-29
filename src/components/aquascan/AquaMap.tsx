@@ -132,8 +132,8 @@ function MapTuning() {
   return null;
 }
 
-/** Pushes the current map center/zoom into the viewportBus on every move/zoom end. */
-function ViewportTracker() {
+/** Pushes the current map center/zoom into the viewportBus + delegates global click. */
+function ViewportTracker({ onMapClick }: { onMapClick: (e: L.LeafletMouseEvent) => void }) {
   const map = useMapEvents({
     moveend: () => {
       const c = map.getCenter();
@@ -143,6 +143,7 @@ function ViewportTracker() {
       const c = map.getCenter();
       viewportBus.set({ lat: c.lat, lng: c.lng, zoom: map.getZoom() });
     },
+    click: (e) => onMapClick(e),
   });
   useEffect(() => {
     const c = map.getCenter();
@@ -357,6 +358,33 @@ const AquaMapInner = forwardRef<AquaMapHandle, Props>(function AquaMapInner(
     [onPolygonComplete],
   );
 
+  /** Click anywhere on the map → spawn a small Custom Point AOI and analyze it. */
+  const onMapClick = useMemo(
+    () => (e: L.LeafletMouseEvent) => {
+      // Ignore clicks that already hit a polygon (Leaflet bubbles up otherwise)
+      const target = e.originalEvent?.target as HTMLElement | null;
+      if (target?.closest?.(".leaflet-interactive")) return;
+
+      const { lat, lng } = e.latlng;
+      // ~1.5 km half-side at the equator; latitude scales fine, longitude scales by cos(lat)
+      const dLat = 0.012;
+      const dLng = 0.012 / Math.max(Math.cos((lat * Math.PI) / 180), 0.15);
+      const ring: [number, number][] = [
+        [lat - dLat, lng - dLng],
+        [lat - dLat, lng + dLng],
+        [lat + dLat, lng + dLng],
+        [lat + dLat, lng - dLng],
+      ];
+      const poly = L.polygon(ring, DRAWN_STYLE);
+      if (fgRef.current) fgRef.current.addLayer(poly);
+      drawnLayersRef.current.push(poly);
+      activeLayerRef.current = poly;
+      const area = polygonAreaKm2(poly.getLatLngs()[0] as L.LatLng[]);
+      onPolygonComplete({ layer: poly, areaKm2: area, source: "drawn" });
+    },
+    [onPolygonComplete],
+  );
+
   return (
     <MapContainer
       center={[48.5, 11.0]}
@@ -368,7 +396,7 @@ const AquaMapInner = forwardRef<AquaMapHandle, Props>(function AquaMapInner(
       worldCopyJump
     >
       <MapTuning />
-      <ViewportTracker />
+      <ViewportTracker onMapClick={onMapClick} />
       <DrawBridge onReady={(s) => (startDrawRef.current = s)} />
 
       <TileLayer
