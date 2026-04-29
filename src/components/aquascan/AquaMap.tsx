@@ -479,7 +479,7 @@ const AquaMapInner = forwardRef<AquaMapHandle, Props>(function AquaMapInner(
       minZoom={2}
       maxZoom={17}
       zoomControl={false}
-      scrollWheelZoom={false}
+      scrollWheelZoom={true}
       className="h-full w-full z-0"
       worldCopyJump
     >
