@@ -264,6 +264,20 @@ const Index = () => {
             )}
         </AnimatePresence>
 
+        {/* RESET DEMO — bottom-left FAB */}
+        <button
+          onClick={handleResetDemo}
+          {...stopMapPropagation}
+          title="Reset Demo"
+          aria-label="Reset Demo"
+          className="group pointer-events-auto absolute bottom-6 left-6 z-[1100] flex items-center gap-2 rounded-2xl border border-white/10 bg-slate-950/75 px-3.5 py-2 text-white/80 backdrop-blur-xl transition-all hover:border-cyan-400/50 hover:bg-cyan-400/10 hover:text-cyan-200 [box-shadow:0_8px_32px_rgba(0,0,0,0.4)]"
+        >
+          <RefreshCw className="h-3.5 w-3.5 transition-transform group-hover:-rotate-180 duration-500" />
+          <span className="font-mono text-[10px] uppercase tracking-[0.22em]">
+            Reset Demo
+          </span>
+        </button>
+
         {analyzing && <LoadingOverlay />}
       </div>
 
