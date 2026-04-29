@@ -50,6 +50,7 @@ interface Props {
   onPolygonComplete: (p: DrawnPolygon) => void;
   onOpenLayers: () => void;
   layers: LayerState;
+  panelOpen?: boolean;
 }
 
 /* ---- Mock geo data — Cluj-Napoca / Apuseni Mountains ---- */
