@@ -139,22 +139,22 @@ export function AnalysisPanel({
       {...stopMapPropagation}
     >
       {/* Header */}
-      <div className="relative flex flex-col gap-1.5 border-b border-white/10 px-5 py-4">
+      <div className="relative flex flex-col gap-2 border-b border-white/10 px-8 py-6">
         <button
           onClick={onClose}
           disabled={running}
-          aria-label="Close basin profile"
-          className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-white/60 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-40"
+          aria-label="Close location intelligence"
+          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-white/60 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-40"
         >
-          <X className="h-3.5 w-3.5" />
+          <X className="h-4 w-4" />
         </button>
         <p className="font-mono text-[9px] uppercase tracking-[0.25em] text-cyan-400 [text-shadow:0_0_10px_rgba(34,211,238,0.6)]">
-          Pre-Feasibility · HeavyWater
+          Location Intelligence · Open-Source GIS
         </p>
-        <h2 className="text-[14px] font-semibold leading-tight text-white">
+        <h2 className="text-[15px] font-semibold leading-tight text-white">
           {zoneName}
         </h2>
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 font-mono text-[9.5px] font-light text-white/55">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 font-mono text-[10px] font-light text-white/55">
           <span>{area.toFixed(2)} km²</span>
           <Dot />
           <span>
@@ -165,11 +165,45 @@ export function AnalysisPanel({
         </div>
       </div>
 
-      <div className="no-scrollbar min-h-0 flex-1 overflow-y-auto px-4 py-4 pb-4">
+      <div className="no-scrollbar min-h-0 flex-1 overflow-y-auto px-8 py-6">
+        {/* === MODE 1 — LOCATION INFO (always visible header card) === */}
+        <div className="mb-6 rounded-2xl border border-cyan-400/20 bg-cyan-400/[0.04] p-5">
+          <div className="mb-4 flex items-center gap-2">
+            <Compass className="h-3.5 w-3.5 text-cyan-300" />
+            <p className="font-mono text-[9.5px] uppercase tracking-[0.22em] text-cyan-300">
+              Open-Source Terrain Snapshot
+            </p>
+          </div>
+          <div className="flex flex-col gap-4">
+            <LocRow
+              icon={Mountain}
+              label="Elevation"
+              meta="Copernicus GLO-30"
+              value={`${report.elevation} m`}
+            />
+            <LocRow
+              icon={MapIcon}
+              label="Terrain Type"
+              meta="Inferred from DEM"
+              value={report.terrainType}
+            />
+            <LocRow
+              icon={Trees}
+              label="Land Cover"
+              meta="CLMS HRL"
+              value={report.landCover}
+            />
+          </div>
+        </div>
+
+        <p className="mb-3 font-mono text-[9px] uppercase tracking-[0.22em] text-white/40">
+          Detailed Pre-Feasibility · CDSE · GloFAS · SoilGrids · Water Law 107/1996
+        </p>
+
         <Accordion
           type="multiple"
           defaultValue={["hydro", "geo", "env", "econ"]}
-          className="flex flex-col gap-2"
+          className="flex flex-col gap-3"
         >
           {/* A — HYDROLOGY */}
           <Section
