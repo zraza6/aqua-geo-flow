@@ -133,7 +133,7 @@ export function AnalysisPanel({
         </div>
       </div>
 
-      <div className="no-scrollbar flex-1 overflow-y-auto px-4 py-4">
+      <div className="no-scrollbar min-h-0 flex-1 overflow-y-auto px-4 py-4 pb-4">
         <Accordion
           type="multiple"
           defaultValue={["hydro", "geo", "env", "econ"]}
