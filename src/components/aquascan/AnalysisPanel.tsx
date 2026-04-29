@@ -132,7 +132,7 @@ export function AnalysisPanel({
       </header>
 
       {/* === SCROLLABLE BODY === */}
-      <div className="dark-scrollbar min-h-0 flex-1 overflow-y-auto overscroll-contain">
+      <div className="dark-scrollbar min-h-0 flex-1 overflow-y-auto overscroll-contain pb-6">
         <div className="flex flex-col gap-5 p-5">
           {/* A — HYDROLOGICAL */}
           <Module
