@@ -1,18 +1,20 @@
-import { Layers, ZoomIn, ZoomOut, Locate, Pencil } from "lucide-react";
+import { Layers, ZoomIn, ZoomOut, Locate, Pencil, Move3d } from "lucide-react";
 import { useMap } from "react-leaflet";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import { GLASS, stopMapPropagation } from "./stopMap";
 
 interface FabsProps {
   onOpenLayers: () => void;
   onStartDraw: () => void;
+  onToggleEdit?: () => boolean;
 }
 
 /** Inner controls — must be inside <MapContainer> so useMap() works. */
-export function MapFabsInner({ onOpenLayers, onStartDraw }: FabsProps) {
+export function MapFabsInner({ onOpenLayers, onStartDraw, onToggleEdit }: FabsProps) {
   const map = useMap();
   const wrapRef = useRef<HTMLDivElement | null>(null);
+  const [editing, setEditing] = useState(false);
 
   // Bullet-proof Leaflet event isolation — kills click-through to the map underneath.
   useEffect(() => {
@@ -33,6 +35,18 @@ export function MapFabsInner({ onOpenLayers, onStartDraw }: FabsProps) {
       <Fab label="Draw AOI" onClick={onStartDraw}>
         <Pencil className="h-5 w-5" />
       </Fab>
+      {onToggleEdit && (
+        <Fab
+          label={editing ? "Exit Edit Mode" : "Edit Polygon"}
+          active={editing}
+          onClick={() => {
+            const next = onToggleEdit();
+            setEditing(next);
+          }}
+        >
+          <Move3d className="h-5 w-5" />
+        </Fab>
+      )}
       <div className={`${GLASS} flex flex-col overflow-hidden p-1`}>
         <button
           aria-label="Zoom in"
