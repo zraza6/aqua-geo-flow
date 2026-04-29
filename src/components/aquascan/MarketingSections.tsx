@@ -309,6 +309,9 @@ export const MarketingSections = () => {
             </div>
 
             <div id="algoritmi" className="scroll-mt-24 rounded-3xl border border-white/10 bg-slate-950/75 p-8 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/30 hover:[box-shadow:0_0_30px_-5px_rgba(34,211,238,0.3)]">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-cyan-400/30 bg-cyan-400/10">
+                  <Workflow className="h-5 w-5 text-cyan-300" />
                 </div>
                 <h3 className="text-lg font-semibold text-white">Algorithm Logic</h3>
               </div>
