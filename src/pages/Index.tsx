@@ -162,14 +162,14 @@ const Index = () => {
             <TopNavbar />
           </div>
 
-          {/* MIDDLE — left nav + context + right analysis */}
-          <div className="pointer-events-none flex items-stretch justify-between gap-3 overflow-hidden sm:gap-4">
+          {/* MIDDLE — all docked LEFT: nav + context + analysis */}
+          <div className="pointer-events-none flex items-stretch overflow-hidden">
             <div className="pointer-events-none flex max-h-full items-stretch gap-3 sm:gap-4">
               <div className="pointer-events-none flex items-center">
                 <CommandHub active={activeSidebarTab} onChange={handleSidebarChange} />
               </div>
               <AnimatePresence mode="wait">
-                {showContext && (
+                {showContext && !selectedBasin && (
                   <motion.div
                     key={activeSidebarTab}
                     initial={{ x: -20, opacity: 0 }}
@@ -186,10 +186,8 @@ const Index = () => {
                   </motion.div>
                 )}
               </AnimatePresence>
-            </div>
 
-            {/* RIGHT — basin intelligence */}
-            <div className="pointer-events-none flex max-h-full items-stretch">
+              {/* Basin intelligence — docked LEFT next to CommandHub */}
               <AnimatePresence>
                 {selectedBasin && (
                   <AnalysisPanel
