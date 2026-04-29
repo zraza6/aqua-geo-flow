@@ -191,6 +191,11 @@ function LayersPanel({
 
   return (
     <div className="flex flex-col gap-3">
+      {/* Source caption */}
+      <p className="px-1 font-mono text-[9px] uppercase leading-relaxed tracking-[0.18em] text-white/45">
+        Source: <span className="text-cyan-300/85">Copernicus Land Monitoring Service (CLMS)</span>
+      </p>
+
       {/* Dynamic viewport indicator */}
       <div className="flex items-center justify-between gap-2 rounded-xl border border-cyan-400/25 bg-cyan-400/[0.06] px-3 py-2">
         <div className="flex items-center gap-1.5">
