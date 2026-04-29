@@ -135,7 +135,7 @@ export function AnalysisPanel({
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: 24, opacity: 0 }}
       transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-      className="pointer-events-auto flex max-h-[88vh] w-[calc(100vw-7rem)] min-w-[450px] max-w-[480px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-900/70 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-md"
+      className="pointer-events-auto flex max-h-[90vh] min-h-[640px] w-[460px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-900/70 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-md"
       {...stopMapPropagation}
     >
       {/* Header */}
