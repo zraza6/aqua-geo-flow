@@ -1,4 +1,4 @@
-import { LayoutDashboard, Layers, Globe2 } from "lucide-react";
+import { LayoutDashboard, Layers } from "lucide-react";
 import { stopMapPropagation, GLASS } from "./stopMap";
 
 export type CommandTab = "dashboard" | "layers";
@@ -19,10 +19,6 @@ export function CommandHub({ active, onChange }: Props) {
       className={`${GLASS} pointer-events-auto flex flex-col items-center gap-1.5 p-2`}
       {...stopMapPropagation}
     >
-      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-400 to-cyan-600 shadow-[0_0_18px_rgba(34,211,238,0.55)]">
-        <Globe2 className="h-4.5 w-4.5 text-slate-950" strokeWidth={2.5} />
-      </div>
-      <div className="my-0.5 h-px w-7 bg-white/10" />
       <div className="flex flex-col items-center gap-1">
         {items.map((it) => {
           const Icon = it.icon;

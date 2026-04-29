@@ -202,7 +202,7 @@ export function AnalysisPanel({
             icon={MapIcon}
             iconColor="text-emerald-400"
             title="Environmental & Legal"
-            sub="CLMS · Legea 107/1996"
+            sub="CLMS · Water Law 107/1996"
           >
             <Row
               label="Urban Proximity"
@@ -219,9 +219,9 @@ export function AnalysisPanel({
               <p className="mt-1 text-[10.5px] font-light leading-snug text-white/80">
                 Requires{" "}
                 <span className="font-medium text-emerald-300">
-                  „Aviz de Gospodărire a Apelor"
+                  "Water Management Approval"
                 </span>{" "}
-                (Art. 48, Legea Apelor nr. 107/1996) before execution.
+                (Art. 48, Romanian Water Law No. 107/1996) prior to execution.
               </p>
             </div>
           </Section>
