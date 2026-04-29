@@ -389,7 +389,7 @@ function StaticOverlays({
 }
 
 const AquaMapInner = forwardRef<AquaMapHandle, Props>(function AquaMapInner(
-  { onPolygonComplete, onOpenLayers, layers, panelOpen },
+  { onPolygonComplete, onOpenLayers, onAreaChange, layers, panelOpen },
   ref,
 ) {
   const fgRef = useRef<L.FeatureGroup | null>(null);
@@ -398,6 +398,8 @@ const AquaMapInner = forwardRef<AquaMapHandle, Props>(function AquaMapInner(
   /** The single "active" layer the simulator will mutate. */
   const activeLayerRef = useRef<L.Polygon | null>(null);
   const drawnLayersRef = useRef<L.Polygon[]>([]);
+  const editingRef = useRef<boolean>(false);
+  const editHandlerRef = useRef<any>(null);
 
   useImperativeHandle(ref, () => ({
     startDraw: () => startDrawRef.current?.(),
@@ -405,6 +407,12 @@ const AquaMapInner = forwardRef<AquaMapHandle, Props>(function AquaMapInner(
       activeLayerRef.current?.setStyle(RESERVOIR_STYLE);
     },
     reset: () => {
+      // Disable edit mode if active
+      if (editHandlerRef.current) {
+        try { editHandlerRef.current.disable(); } catch {}
+        editHandlerRef.current = null;
+      }
+      editingRef.current = false;
       // Reset DEM zones
       Object.values(zoneRefs.current).forEach((p) => p?.setStyle(DEM_STYLE));
       // Remove drawn shapes
@@ -412,6 +420,34 @@ const AquaMapInner = forwardRef<AquaMapHandle, Props>(function AquaMapInner(
       drawnLayersRef.current = [];
       activeLayerRef.current = null;
     },
+    toggleEdit: () => {
+      const layer = activeLayerRef.current;
+      if (!layer || typeof (layer as any).editing === "undefined") return false;
+      if (editingRef.current) {
+        try { (layer as any).editing.disable(); } catch {}
+        editingRef.current = false;
+        return false;
+      }
+      try {
+        (layer as any).editing.enable();
+        editingRef.current = true;
+        editHandlerRef.current = (layer as any).editing;
+        // Live update area on vertex drag
+        layer.on("edit", () => {
+          const latlngs = layer.getLatLngs()[0] as L.LatLng[];
+          onAreaChange?.(polygonAreaKm2(latlngs));
+        });
+        // leaflet-draw fires editdrag while dragging vertex
+        (layer as any).on?.("editdrag", () => {
+          const latlngs = layer.getLatLngs()[0] as L.LatLng[];
+          onAreaChange?.(polygonAreaKm2(latlngs));
+        });
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    isEditing: () => editingRef.current,
   }));
 
   // Stable handlers — never change identity
