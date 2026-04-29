@@ -9,9 +9,6 @@ import {
   ShieldAlert,
   Scale,
   TrendingUp,
-  Leaf,
-  Building2,
-  CheckCircle2,
   AlertTriangle,
 } from "lucide-react";
 import { useMemo } from "react";
