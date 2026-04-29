@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { CheckCircle2 } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import L from "leaflet";
 import {
   AquaMap,
   RECOMMENDED_ZONES,
@@ -25,12 +27,27 @@ interface SelectedBasin {
   name: string;
   areaKm2: number;
   source: "drawn" | "recommended";
+  lat: number;
+  lng: number;
+}
+
+function polygonCentroid(layer: L.Polygon): { lat: number; lng: number } {
+  const latlngs = layer.getLatLngs()[0] as L.LatLng[];
+  if (!latlngs?.length) return { lat: 0, lng: 0 };
+  let lat = 0;
+  let lng = 0;
+  latlngs.forEach((p) => {
+    lat += p.lat;
+    lng += p.lng;
+  });
+  return { lat: lat / latlngs.length, lng: lng / latlngs.length };
 }
 
 const Index = () => {
   const mapRef = useRef<AquaMapHandle>(null);
 
   const [activeSidebarTab, setActiveSidebarTab] = useState<CommandTab>("dashboard");
+  const [showContext, setShowContext] = useState(true);
   const [layers, setLayers] = useState<LayerState>({
     waterEvolution: false,
     sarUrban: false,
@@ -53,6 +70,7 @@ const Index = () => {
 
   const handlePolygonComplete = (p: DrawnPolygon) => {
     const z = p.zoneId ? RECOMMENDED_ZONES.find((r) => r.id === p.zoneId) : null;
+    const { lat, lng } = polygonCentroid(p.layer);
     setHasInteracted(true);
     setSimulationStatus("idle");
     setAnalyzing(true);
@@ -63,8 +81,10 @@ const Index = () => {
         name: z?.name ?? "Custom AOI · Drawn",
         areaKm2: p.areaKm2,
         source: p.source,
+        lat,
+        lng,
       });
-    }, 1800);
+    }, 1400);
     timersRef.current.push(t);
   };
 
@@ -76,7 +96,6 @@ const Index = () => {
     const t1 = window.setTimeout(() => setSimulationStatus("deviating"), 1500);
     const t2 = window.setTimeout(() => setSimulationStatus("constructing"), 3000);
     const t3 = window.setTimeout(() => {
-      // Direct Leaflet mutation — no React re-render of the map
       mapRef.current?.applyReservoirStyle();
       setSimulationStatus("complete");
       toast.success("Simulation Complete", {
@@ -101,94 +120,127 @@ const Index = () => {
     setSimulationStatus("idle");
   };
 
+  const handleSidebarChange = (t: CommandTab) => {
+    if (t === activeSidebarTab) {
+      setShowContext((s) => !s);
+    } else {
+      setActiveSidebarTab(t);
+      setShowContext(true);
+    }
+  };
+
   return (
     <main className="relative w-full bg-slate-950">
       <div className="relative h-screen w-full overflow-hidden">
-      {/* === LAYER 0: MAP === */}
-      <div className="absolute inset-0 z-0">
-        <AquaMap
-          ref={mapRef}
-          onPolygonComplete={handlePolygonComplete}
-          onOpenLayers={() => setActiveSidebarTab("layers")}
-          layers={layers}
+        {/* === LAYER 0: MAP === */}
+        <div className="absolute inset-0 z-0">
+          <AquaMap
+            ref={mapRef}
+            onPolygonComplete={handlePolygonComplete}
+            onOpenLayers={() => {
+              setActiveSidebarTab("layers");
+              setShowContext(true);
+            }}
+            layers={layers}
+          />
+        </div>
+
+        {/* Decorative grid + vignette */}
+        <div className="pointer-events-none absolute inset-0 z-[5] grid-overlay opacity-15 mix-blend-overlay" />
+        <div
+          className="pointer-events-none absolute inset-0 z-[5] opacity-50"
+          style={{
+            background:
+              "radial-gradient(circle at 50% 0%, rgba(34,211,238,0.10), transparent 60%), radial-gradient(circle at 50% 100%, rgba(2,6,23,0.6), transparent 70%)",
+          }}
         />
-      </div>
 
-      {/* Decorative grid + vignette */}
-      <div className="pointer-events-none absolute inset-0 z-[5] grid-overlay opacity-15 mix-blend-overlay" />
-      <div
-        className="pointer-events-none absolute inset-0 z-[5] opacity-50"
-        style={{
-          background:
-            "radial-gradient(circle at 50% 0%, rgba(34,211,238,0.10), transparent 60%), radial-gradient(circle at 50% 100%, rgba(2,6,23,0.6), transparent 70%)",
-        }}
-      />
+        {/* === LAYER 1: UI OVERLAY (flex grid, no overlaps) === */}
+        <div className="pointer-events-none absolute inset-0 z-50 grid grid-rows-[auto_1fr_auto] gap-3 p-3 sm:gap-4 sm:p-5">
+          {/* TOP — brand + hint flex column so they stack, never overlap */}
+          <div className="pointer-events-none flex flex-col items-center gap-2.5">
+            <TopNavbar />
 
-      {/* === LAYER 1: UI OVERLAY === */}
-      <div className="pointer-events-none absolute inset-0 z-50 flex flex-col p-3 sm:p-6">
-        {/* TOP — brand */}
-        <div className="pointer-events-none flex shrink-0 justify-center">
-          <TopNavbar />
-        </div>
+            <AnimatePresence>
+              {!hasInteracted &&
+                !analyzing &&
+                simulationStatus === "idle" &&
+                !selectedBasin && (
+                  <motion.div
+                    initial={{ y: -8, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: -8, opacity: 0 }}
+                    transition={{ duration: 0.25 }}
+                    className="pointer-events-none px-2"
+                    {...stopMapPropagation}
+                  >
+                    <div className="flex items-center gap-2 rounded-full border border-white/10 bg-slate-900/70 px-3.5 py-1.5 backdrop-blur-md shadow-[0_8px_24px_rgba(0,0,0,0.4)]">
+                      <span className="relative flex h-1.5 w-1.5">
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-75" />
+                        <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-cyan-400" />
+                      </span>
+                      <p className="font-mono text-[9.5px] font-light uppercase tracking-[0.18em] text-white/85">
+                        Click any zone · or draw an AOI anywhere on the globe
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+            </AnimatePresence>
+          </div>
 
-        {/* MIDDLE — left nav + context + analysis */}
-        <div className="pointer-events-none mt-4 flex flex-1 items-stretch justify-between gap-3 overflow-hidden sm:gap-4">
-          <div className="pointer-events-none flex max-h-full items-stretch gap-3 sm:gap-4">
-            <div className="pointer-events-none flex items-center">
-              <CommandHub active={activeSidebarTab} onChange={setActiveSidebarTab} />
+          {/* MIDDLE — left nav + context + right analysis */}
+          <div className="pointer-events-none flex items-stretch justify-between gap-3 overflow-hidden sm:gap-4">
+            <div className="pointer-events-none flex max-h-full items-stretch gap-3 sm:gap-4">
+              <div className="pointer-events-none flex items-center">
+                <CommandHub active={activeSidebarTab} onChange={handleSidebarChange} />
+              </div>
+              <AnimatePresence mode="wait">
+                {showContext && (
+                  <motion.div
+                    key={activeSidebarTab}
+                    initial={{ x: -20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    exit={{ x: -20, opacity: 0 }}
+                    transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
+                    className="pointer-events-none hidden max-h-full md:block"
+                  >
+                    <ContextPanel
+                      tab={activeSidebarTab}
+                      layers={layers}
+                      onToggleLayer={handleToggleLayer}
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
-            <div className="pointer-events-none hidden max-h-full md:block">
-              <ContextPanel
-                tab={activeSidebarTab}
-                layers={layers}
-                onToggleLayer={handleToggleLayer}
-              />
+
+            {/* RIGHT — basin intelligence */}
+            <div className="pointer-events-none flex max-h-full items-stretch">
+              <AnimatePresence>
+                {selectedBasin && (
+                  <AnalysisPanel
+                    key={selectedBasin.id}
+                    onClose={handleClosePanel}
+                    onSimulate={handleSimulate}
+                    onReset={handleReset}
+                    area={selectedBasin.areaKm2}
+                    zoneName={selectedBasin.name}
+                    lat={selectedBasin.lat}
+                    lng={selectedBasin.lng}
+                    simulationStatus={simulationStatus}
+                  />
+                )}
+              </AnimatePresence>
             </div>
           </div>
 
-          {/* RIGHT — basin intelligence (modeless, slides in) */}
-          <div className="pointer-events-none flex max-h-full items-stretch">
-            {selectedBasin && (
-              <AnalysisPanel
-                onClose={handleClosePanel}
-                onSimulate={handleSimulate}
-                onReset={handleReset}
-                area={selectedBasin.areaKm2}
-                zoneName={selectedBasin.name}
-                simulationStatus={simulationStatus}
-              />
-            )}
+          {/* BOTTOM — legend */}
+          <div className="pointer-events-none flex justify-start">
+            <MapLegend layers={layers} />
           </div>
         </div>
 
-        {/* BOTTOM — legend */}
-        <div className="pointer-events-none mt-3 flex shrink-0 justify-start sm:mt-4">
-          <MapLegend layers={layers} />
-        </div>
-      </div>
-
-      {/* HINT */}
-      {!hasInteracted &&
-        !analyzing &&
-        simulationStatus === "idle" &&
-        !selectedBasin && (
-          <div
-            className="pointer-events-none absolute left-1/2 top-24 z-[60] -translate-x-1/2 px-3"
-            {...stopMapPropagation}
-          >
-            <div className="flex items-center gap-2.5 rounded-full border border-white/10 bg-slate-900/60 px-4 py-2 backdrop-blur-3xl shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-cyan-400" />
-              </span>
-              <p className="font-mono text-[10px] font-light uppercase tracking-[0.18em] text-white/85">
-                Click a gold valley · or draw a custom AOI
-              </p>
-            </div>
-          </div>
-        )}
-
-      {analyzing && <LoadingOverlay />}
+        {analyzing && <LoadingOverlay />}
       </div>
 
       {/* === SCROLLABLE LANDING SECTIONS === */}
