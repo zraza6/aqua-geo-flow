@@ -132,7 +132,7 @@ export function AnalysisPanel({
           <Module
             icon={Activity}
             tone="cyan"
-            label="A · Hydrological Data"
+            label="A · Hydrology"
             source="GloFAS / CDSE"
           >
             <DataRow
@@ -156,7 +156,7 @@ export function AnalysisPanel({
           <Module
             icon={ShieldAlert}
             tone="amber"
-            label="B · Geotechnical Analysis"
+            label="B · Geotechnics"
             source="SoilGrids v2.0 / EGMS"
           >
             <DataRow
@@ -186,7 +186,7 @@ export function AnalysisPanel({
           <Module
             icon={Scale}
             tone="emerald"
-            label="C · Environmental & Legal"
+            label="C · Legal Compliance"
             source="Romanian Water Law 107/1996"
           >
             <DataRow
