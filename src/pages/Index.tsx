@@ -21,6 +21,7 @@ import { CommandHub, type CommandTab } from "@/components/aquascan/CommandHub";
 import { ContextPanel } from "@/components/aquascan/ContextPanel";
 import { stopMapPropagation } from "@/components/aquascan/stopMap";
 import { MarketingSections } from "@/components/aquascan/MarketingSections";
+import { SubNavPill } from "@/components/aquascan/SubNavPill";
 
 interface SelectedBasin {
   id: string;
