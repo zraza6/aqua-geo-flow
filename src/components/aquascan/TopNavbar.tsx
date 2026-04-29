@@ -47,7 +47,7 @@ export function TopNavbar() {
             </div>
             <div className="flex flex-col leading-tight">
               <h1 className="text-[12px] font-bold tracking-wide text-white sm:text-[13px]">
-                AquaScan{" "}
+                Aqua Scan{" "}
                 <span className="font-mono font-semibold text-cyan-400 [text-shadow:0_0_10px_rgba(34,211,238,0.7)]">
                   Pro
                 </span>
