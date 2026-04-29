@@ -1,4 +1,17 @@
-import { Activity, Droplets, FileText, MapPin, BookOpen } from "lucide-react";
+import {
+  Activity,
+  Droplets,
+  FileText,
+  MapPin,
+  BookOpen,
+  Layers,
+  Mountain,
+  Radar,
+  Code2,
+  Workflow,
+  Database,
+  Cpu,
+} from "lucide-react";
 import { motion, useMotionValue, useTransform } from "framer-motion";
 import { useRef } from "react";
 
