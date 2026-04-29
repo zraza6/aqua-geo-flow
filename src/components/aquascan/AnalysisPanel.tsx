@@ -6,21 +6,14 @@ import {
   Waves,
   Cpu,
   Activity,
-  Droplets,
-  Map as MapIcon,
   ShieldAlert,
   Scale,
   TrendingUp,
-  Mountain,
-  Trees,
-  Compass,
+  Leaf,
+  Building2,
+  CheckCircle2,
+  AlertTriangle,
 } from "lucide-react";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { stopMapPropagation } from "./stopMap";
@@ -43,7 +36,7 @@ interface Props {
   lng: number;
 }
 
-/* ---------- Seeded RNG so a given coord always produces the same report ---------- */
+/* Seeded RNG so a given coord always produces the same report */
 function mulberry32(seed: number) {
   let a = seed >>> 0;
   return () => {
@@ -71,61 +64,26 @@ export function AnalysisPanel({
     simulationStatus === "modeling" ||
     simulationStatus === "deviating" ||
     simulationStatus === "constructing";
-  const done = simulationStatus === "complete";
 
-  /* Deterministic mock pre-feasibility report driven by coordinates. */
   const report = useMemo(() => {
     const seed = Math.floor((lat + 90) * 1e4) ^ Math.floor((lng + 180) * 1e4);
     const r = mulberry32(seed || 1);
 
-    // Coarse elevation model: latitude band + jitter so it varies globally
-    const baseElev = Math.max(
-      0,
-      Math.round(rand(r, 20, 2400) * (1 - Math.abs(Math.abs(lat) - 45) / 90)),
-    );
-    const elevation = baseElev;
-    const terrainType =
-      elevation < 200
-        ? "Plains / Lowland"
-        : elevation < 800
-          ? "Hills / Plateau"
-          : elevation < 1800
-            ? "Mountainous Terrain"
-            : "Alpine / High Mountain";
-    const landCovers = [
-      "Broadleaf Forest",
-      "Coniferous Forest",
-      "Grassland",
-      "Cropland",
-      "Sparse Vegetation",
-      "Wetland",
-      "Bare Soil",
-      "Urban Fabric",
-    ];
-    const landCover = landCovers[Math.floor(r() * landCovers.length)];
-
-    const elevDrop = rand(r, 15, 120);
-    const discharge = rand(r, 0.5, 45.2);
-    const continuity = r() > 0.35 ? "Stable" : "Drought-prone";
-    const ksat = rand(r, 2.1, 35.5);
-    const egms = rand(r, -4.5, 1.2);
-    const urbanDist = rand(r, 0.5, 15);
-    const roiSavings = Math.round(rand(r, 18000, 45000) / 100) * 100;
+    const discharge = rand(r, 2.5, 40);
+    const peakFlow = rand(r, 150, 450);
+    const ksat = rand(r, 5, 35);
+    const bedrock = rand(r, 4, 12);
+    const urbanDist = rand(r, 5, 20);
 
     return {
-      elevation: elevation.toLocaleString("en-US"),
-      terrainType,
-      landCover,
-      elevDrop: elevDrop.toFixed(1),
-      discharge: discharge.toFixed(2),
-      continuity,
-      ksat: ksat.toFixed(2),
+      discharge: discharge.toFixed(1),
+      peakFlow: Math.round(peakFlow),
+      catchmentEff: 82,
+      ksat: ksat.toFixed(1),
       ksatHigh: ksat > 20,
-      egms: (egms >= 0 ? "+" : "") + egms.toFixed(2),
-      egmsRisk: egms < -2,
-      urbanDist:
-        urbanDist >= 1 ? `${urbanDist.toFixed(2)} km` : `${Math.round(urbanDist * 1000)} m`,
-      roiSavings: roiSavings.toLocaleString("de-DE"),
+      bedrock: bedrock.toFixed(1),
+      egms: -1.2,
+      urbanDist: urbanDist.toFixed(1),
     };
   }, [lat, lng]);
 
@@ -135,305 +93,260 @@ export function AnalysisPanel({
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: 24, opacity: 0 }}
       transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-      className="pointer-events-auto mr-16 flex max-h-[80vh] w-[440px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-900/70 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-md"
+      className="pointer-events-auto mr-20 flex h-[70vh] w-[480px] flex-col overflow-hidden rounded-2xl border border-cyan-400/20 bg-slate-950/85 backdrop-blur-2xl shadow-[0_0_40px_-8px_rgba(34,211,238,0.35),0_20px_60px_-15px_rgba(0,0,0,0.7)]"
       {...stopMapPropagation}
     >
-      {/* Header */}
-      <div className="relative flex shrink-0 flex-col gap-2 border-b border-white/10 px-8 py-5">
+      {/* === STICKY HEADER === */}
+      <header className="relative shrink-0 border-b border-white/10 bg-slate-950/70 px-6 py-5 backdrop-blur-xl">
         <button
           onClick={onClose}
           disabled={running}
-          aria-label="Close location intelligence"
-          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-white/60 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-40"
+          aria-label="Close report"
+          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white/60 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-40"
         >
           <X className="h-4 w-4" />
         </button>
-        <p className="font-mono text-[9px] uppercase tracking-[0.25em] text-cyan-400 [text-shadow:0_0_10px_rgba(34,211,238,0.6)]">
-          Location Intelligence · Open-Source GIS
+        <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-cyan-400 [text-shadow:0_0_10px_rgba(34,211,238,0.6)]">
+          Pre-Feasibility Site Report
         </p>
-        <h2 className="text-[15px] font-semibold leading-tight text-white">
+        <h2 className="mt-1.5 pr-8 text-[16px] font-semibold leading-tight text-white">
           {zoneName}
         </h2>
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 font-mono text-[10px] font-light text-white/55">
-          <span>{area.toFixed(2)} km²</span>
-          <Dot />
-          <span>
-            {lat.toFixed(3)}°, {lng.toFixed(3)}°
+        <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[10px] text-white/60">
+          <span className="rounded-md border border-white/10 bg-white/5 px-2 py-0.5">
+            <span className="text-white/40">AOI</span>{" "}
+            <strong className="font-bold text-white">{area.toFixed(2)} km²</strong>
           </span>
-          <Dot />
-          <span>EPSG:4326</span>
+          <span className="rounded-md border border-white/10 bg-white/5 px-2 py-0.5">
+            <span className="text-white/40">LAT</span>{" "}
+            <strong className="font-bold text-white">{lat.toFixed(4)}°</strong>
+          </span>
+          <span className="rounded-md border border-white/10 bg-white/5 px-2 py-0.5">
+            <span className="text-white/40">LNG</span>{" "}
+            <strong className="font-bold text-white">{lng.toFixed(4)}°</strong>
+          </span>
         </div>
-      </div>
+      </header>
 
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-8 py-6" style={{ scrollbarWidth: "thin" }}>
-        {/* === MODE 1 — LOCATION INFO (always visible header card) === */}
-        <div className="mb-6 rounded-2xl border border-cyan-400/20 bg-cyan-400/[0.04] p-5">
-          <div className="mb-4 flex items-center gap-2">
-            <Compass className="h-3.5 w-3.5 text-cyan-300" />
-            <p className="font-mono text-[9.5px] uppercase tracking-[0.22em] text-cyan-300">
-              Open-Source Terrain Snapshot
-            </p>
-          </div>
-          <div className="flex flex-col gap-4">
-            <LocRow
-              icon={Mountain}
-              label="Elevation"
-              meta="Copernicus GLO-30"
-              value={`${report.elevation} m`}
-            />
-            <LocRow
-              icon={MapIcon}
-              label="Terrain Type"
-              meta="Inferred from DEM"
-              value={report.terrainType}
-            />
-            <LocRow
-              icon={Trees}
-              label="Land Cover"
-              meta="CLMS HRL"
-              value={report.landCover}
-            />
-          </div>
-        </div>
-
-        <p className="mb-3 font-mono text-[9px] uppercase tracking-[0.22em] text-white/40">
-          Detailed Pre-Feasibility · CDSE · GloFAS · SoilGrids · Water Law 107/1996
-        </p>
-
-        <Accordion
-          type="multiple"
-          defaultValue={["hydro", "geo", "env", "econ"]}
-          className="flex flex-col gap-3"
-        >
-          {/* A — HYDROLOGY */}
-          <Section
-            value="hydro"
+      {/* === SCROLLABLE BODY === */}
+      <div className="dark-scrollbar min-h-0 flex-1 overflow-y-auto overscroll-contain">
+        <div className="flex flex-col gap-5 p-5">
+          {/* A — HYDROLOGICAL */}
+          <Module
             icon={Activity}
-            iconColor="text-cyan-400"
-            title="Hydrology & Terrain"
-            sub="CDSE · GloFAS"
+            tone="cyan"
+            label="A · Hydrological Data"
+            source="GloFAS / CDSE"
           >
-            <Row
-              label="DEM Elevation Drop"
-              meta="Copernicus GLO-30"
-              value={`${report.elevDrop} m`}
-            />
-            <Row
-              label="Average Discharge"
-              meta="GloFAS / EFAS"
+            <DataRow
+              label="Average Annual Discharge"
               value={`${report.discharge} m³/s`}
             />
-            <Row
-              label="Flow Continuity"
-              meta="Multi-year ensemble"
-              value={report.continuity}
-              valueTone={
-                report.continuity === "Stable" ? "emerald" : "amber"
-              }
-              warn={report.continuity !== "Stable" ? "Warning" : undefined}
+            <DataRow
+              label="Peak Flow (100y return)"
+              value={`${report.peakFlow} m³/s`}
             />
-          </Section>
+            <DataRow
+              label="Catchment Efficiency"
+              value={`High (${report.catchmentEff}%)`}
+              status="good"
+            />
+          </Module>
+
+          <Divider />
 
           {/* B — GEOTECHNICAL */}
-          <Section
-            value="geo"
+          <Module
             icon={ShieldAlert}
-            iconColor="text-amber-400"
-            title="Geotechnical & Stability"
-            sub="SoilGrids · EGMS"
+            tone="amber"
+            label="B · Geotechnical Analysis"
+            source="SoilGrids v2.0 / EGMS"
           >
-            <Row
+            <DataRow
               label="Soil Permeability (Ksat)"
-              meta="ISRIC SoilGrids v2.0"
               value={`${report.ksat} mm/h`}
-              valueTone={report.ksatHigh ? "rose" : "emerald"}
+              status={report.ksatHigh ? "bad" : "good"}
             />
             {report.ksatHigh && (
-              <Tag tone="rose">High Seepage · HDPE Liner Required</Tag>
+              <Alert tone="bad">
+                High Seepage Risk — Impermeable Lining Required
+              </Alert>
             )}
-            <Row
-              label="Structural Stability"
-              meta="EGMS L3 Vertical"
-              value={`${report.egms} mm/yr`}
-              valueTone={report.egmsRisk ? "rose" : "emerald"}
+            <DataRow
+              label="Bedrock Depth"
+              value={`Approx. ${report.bedrock} m`}
             />
-            {report.egmsRisk && (
-              <Tag tone="rose">Subsidence Risk Detected</Tag>
-            )}
-          </Section>
+            <DataRow
+              label="Structural Stability (InSAR)"
+              value={`${report.egms} mm/yr (Stable)`}
+              status="good"
+            />
+          </Module>
 
-          {/* C — ENVIRONMENTAL */}
-          <Section
-            value="env"
-            icon={MapIcon}
-            iconColor="text-emerald-400"
-            title="Environmental & Legal"
-            sub="CLMS · Water Law 107/1996"
+          <Divider />
+
+          {/* C — ENVIRONMENTAL & LEGAL */}
+          <Module
+            icon={Scale}
+            tone="emerald"
+            label="C · Environmental & Legal"
+            source="Romanian Water Law 107/1996"
           >
-            <Row
-              label="Urban Proximity"
-              meta="Copernicus CLMS HRL"
-              value={report.urbanDist}
+            <DataRow
+              label="Compliance"
+              value="Art. 48 compliant"
+              status="good"
             />
-            <div className="mt-2 rounded-xl border border-white/10 bg-white/[0.03] p-2.5">
-              <div className="flex items-center gap-1.5">
-                <Scale className="h-3 w-3 text-emerald-400" />
-                <p className="font-mono text-[8.5px] uppercase tracking-[0.2em] text-white/55">
-                  Legal Status
-                </p>
-              </div>
-              <p className="mt-1 text-[10.5px] font-light leading-snug text-white/80">
-                Requires{" "}
-                <span className="font-medium text-emerald-300">
-                  "Water Management Approval"
-                </span>{" "}
-                (Art. 48, Romanian Water Law No. 107/1996) prior to execution.
-              </p>
-            </div>
-          </Section>
+            <DataRow
+              label="Urban Proximity"
+              value={`${report.urbanDist} km to nearest settlement`}
+            />
+            <DataRow
+              label="Protected Areas"
+              value="No environmental overlap"
+              status="good"
+            />
+          </Module>
+
+          <Divider />
 
           {/* D — ECONOMICS */}
-          <Section
-            value="econ"
-            icon={Droplets}
-            iconColor="text-cyan-400"
-            title="Enterprise Economics"
-            sub="SEAP averages"
+          <Module
+            icon={TrendingUp}
+            tone="cyan"
+            label="D · Project Economics"
+            source="SEAP Public Procurement Data"
           >
-            <div className="rounded-xl border border-cyan-400/30 bg-cyan-400/[0.07] p-3">
-              <div className="flex items-center gap-1.5">
-                <TrendingUp className="h-3 w-3 text-cyan-400" />
-                <p className="font-mono text-[8.5px] uppercase tracking-[0.22em] text-cyan-300">
-                  ROI Estimate
-                </p>
-              </div>
+            <div className="rounded-xl border border-cyan-400/30 bg-cyan-400/[0.06] p-4">
+              <p className="font-mono text-[8.5px] uppercase tracking-[0.22em] text-cyan-300">
+                Digital Survey Savings
+              </p>
               <p
-                className="mt-1.5 font-mono text-xl font-bold leading-none text-cyan-300"
+                className="mt-1.5 font-mono text-2xl font-bold leading-none text-cyan-300"
                 style={{ textShadow: "0 0 14px rgba(34,211,238,0.6)" }}
               >
-                €{report.roiSavings}
+                €18,500
               </p>
-              <p className="mt-1.5 text-[10.5px] font-light leading-snug text-white/70">
-                Replaces ~6 months of manual topographical surveys. Estimate
-                derived from SEAP public procurement averages.
+              <p className="mt-2.5 text-[11px] font-light leading-snug text-white/70">
+                Replaces <strong className="font-bold text-white">6 months</strong>{" "}
+                of manual topographical field work.
               </p>
             </div>
-          </Section>
-        </Accordion>
+          </Module>
+        </div>
       </div>
 
-      {/* Decision footer — Simulate is a SECONDARY action below Location Info */}
-      <div className="shrink-0 border-t border-white/10 bg-slate-900/95 px-8 py-5 backdrop-blur-md">
-        <p className="mb-3 font-mono text-[8.5px] uppercase tracking-[0.22em] text-white/40">
-          Secondary action · advanced simulation
-        </p>
+      {/* === STICKY FOOTER === */}
+      <footer className="shrink-0 border-t border-white/10 bg-slate-900/95 px-5 py-4 backdrop-blur-xl">
         <SimulatorButton
           status={simulationStatus}
           onSimulate={onSimulate}
           onReset={onReset}
         />
-      </div>
+      </footer>
     </motion.aside>
   );
 }
 
 /* ---------- Sub-components ---------- */
-function Section({
-  value,
+
+function Module({
   icon: Icon,
-  iconColor,
-  title,
-  sub,
+  tone,
+  label,
+  source,
   children,
 }: {
-  value: string;
   icon: any;
-  iconColor: string;
-  title: string;
-  sub: string;
+  tone: "cyan" | "amber" | "emerald";
+  label: string;
+  source: string;
   children: React.ReactNode;
 }) {
+  const toneCls = {
+    cyan: "text-cyan-400 border-cyan-400/30 bg-cyan-400/10",
+    amber: "text-amber-400 border-amber-400/30 bg-amber-400/10",
+    emerald: "text-emerald-400 border-emerald-400/30 bg-emerald-400/10",
+  }[tone];
   return (
-    <AccordionItem
-      value={value}
-      className="rounded-xl border border-white/10 bg-white/[0.03] px-3 data-[state=open]:bg-white/[0.05]"
-    >
-      <AccordionTrigger className="py-2.5 hover:no-underline">
-        <span className="flex items-center gap-2">
-          <Icon className={`h-3.5 w-3.5 ${iconColor}`} />
-          <span className="flex flex-col items-start leading-tight">
-            <span className="text-[11px] font-semibold text-white">{title}</span>
-            <span className="font-mono text-[8.5px] uppercase tracking-[0.18em] text-white/40">
-              {sub}
-            </span>
+    <section className="flex flex-col gap-3">
+      <div className="flex items-center gap-2.5">
+        <div
+          className={`flex h-7 w-7 items-center justify-center rounded-lg border ${toneCls}`}
+        >
+          <Icon className="h-3.5 w-3.5" />
+        </div>
+        <div className="flex min-w-0 flex-col leading-tight">
+          <span className="text-[11.5px] font-semibold uppercase tracking-wider text-white">
+            {label}
           </span>
-        </span>
-      </AccordionTrigger>
-      <AccordionContent className="pb-3">
-        <div className="flex flex-col gap-1.5">{children}</div>
-      </AccordionContent>
-    </AccordionItem>
+          <span className="font-mono text-[8.5px] uppercase tracking-[0.18em] text-white/40">
+            Source: {source}
+          </span>
+        </div>
+      </div>
+      <div className="flex flex-col gap-1.5">{children}</div>
+    </section>
   );
 }
 
-function Row({
+function DataRow({
   label,
-  meta,
   value,
-  valueTone = "white",
-  warn,
+  status,
 }: {
   label: string;
-  meta?: string;
   value: string;
-  valueTone?: "white" | "emerald" | "rose" | "amber";
-  warn?: string;
+  status?: "good" | "bad";
 }) {
-  const toneCls = {
-    white: "text-white",
-    emerald: "text-emerald-300",
-    rose: "text-rose-300",
-    amber: "text-amber-300",
-  }[valueTone];
+  const statusDot =
+    status === "good"
+      ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.7)]"
+      : status === "bad"
+        ? "bg-rose-400 shadow-[0_0_8px_rgba(251,113,133,0.7)]"
+        : null;
+  const valueCls =
+    status === "good"
+      ? "text-emerald-300"
+      : status === "bad"
+        ? "text-rose-300"
+        : "text-white";
   return (
-    <div className="flex items-start justify-between gap-3 rounded-lg border border-white/5 bg-white/[0.02] px-2.5 py-1.5">
-      <div className="flex min-w-0 flex-col">
-        <span className="text-[10.5px] font-light leading-tight text-white/80">
-          {label}
-        </span>
-        {meta && (
-          <span className="font-mono text-[8.5px] uppercase tracking-wider text-white/35">
-            {meta}
-          </span>
-        )}
-      </div>
-      <div className="flex shrink-0 flex-col items-end gap-0.5">
-        <span className={`font-mono text-[11px] font-semibold ${toneCls}`}>
+    <div className="flex items-center justify-between gap-3 rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2">
+      <span className="text-[11.5px] font-light text-white/75">{label}</span>
+      <div className="flex shrink-0 items-center gap-2">
+        {statusDot && <span className={`h-1.5 w-1.5 rounded-full ${statusDot}`} />}
+        <span className={`font-mono text-[12px] font-bold ${valueCls}`}>
           {value}
         </span>
-        {warn && (
-          <span className="rounded-full bg-amber-400/15 px-1.5 py-px font-mono text-[8px] uppercase tracking-wider text-amber-300">
-            {warn}
-          </span>
-        )}
       </div>
     </div>
   );
 }
 
-function Tag({ tone, children }: { tone: "rose" | "amber"; children: React.ReactNode }) {
+function Alert({
+  tone,
+  children,
+}: {
+  tone: "bad" | "warn";
+  children: React.ReactNode;
+}) {
   const cls =
-    tone === "rose"
+    tone === "bad"
       ? "border-rose-400/40 bg-rose-400/10 text-rose-200"
       : "border-amber-400/40 bg-amber-400/10 text-amber-200";
   return (
     <div
-      className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-[10px] font-medium ${cls}`}
+      className={`flex items-start gap-2 rounded-lg border px-3 py-2 text-[10.5px] font-medium leading-snug ${cls}`}
     >
-      <ShieldAlert className="h-3 w-3" />
+      <AlertTriangle className="mt-px h-3.5 w-3.5 shrink-0" />
       <span>{children}</span>
     </div>
   );
+}
+
+function Divider() {
+  return <div className="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />;
 }
 
 function SimulatorButton({
@@ -505,46 +418,6 @@ function SimulatorButton({
           />
         ))}
       </div>
-    </div>
-  );
-}
-
-function Dot() {
-  return <span className="h-1 w-1 rounded-full bg-white/20" />;
-}
-
-function LocRow({
-  icon: Icon,
-  label,
-  meta,
-  value,
-}: {
-  icon: any;
-  label: string;
-  meta: string;
-  value: string;
-}) {
-  return (
-    <div className="flex items-center justify-between gap-4">
-      <div className="flex min-w-0 items-center gap-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-cyan-400/20 bg-cyan-400/[0.08]">
-          <Icon className="h-4 w-4 text-cyan-300" />
-        </div>
-        <div className="flex min-w-0 flex-col">
-          <span className="text-[11px] font-light leading-tight text-white/70">
-            {label}
-          </span>
-          <span className="font-mono text-[8.5px] uppercase tracking-wider text-white/40">
-            {meta}
-          </span>
-        </div>
-      </div>
-      <span
-        className="font-mono text-[13px] font-bold text-white"
-        style={{ textShadow: "0 0 10px rgba(34,211,238,0.35)" }}
-      >
-        {value}
-      </span>
     </div>
   );
 }
