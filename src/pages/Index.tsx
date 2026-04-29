@@ -22,6 +22,7 @@ import { ContextPanel } from "@/components/aquascan/ContextPanel";
 import { stopMapPropagation } from "@/components/aquascan/stopMap";
 import { MarketingSections } from "@/components/aquascan/MarketingSections";
 import { SubNavPill } from "@/components/aquascan/SubNavPill";
+import { FloatingNavMenu } from "@/components/aquascan/FloatingNavMenu";
 
 interface SelectedBasin {
   id: string;
