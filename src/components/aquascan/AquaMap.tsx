@@ -50,6 +50,7 @@ interface Props {
   onPolygonComplete: (p: DrawnPolygon) => void;
   onOpenLayers: () => void;
   layers: LayerState;
+  panelOpen?: boolean;
 }
 
 /* ---- Mock geo data — Cluj-Napoca / Apuseni Mountains ---- */
@@ -318,7 +319,7 @@ function StaticOverlays({
 }
 
 const AquaMapInner = forwardRef<AquaMapHandle, Props>(function AquaMapInner(
-  { onPolygonComplete, onOpenLayers, layers },
+  { onPolygonComplete, onOpenLayers, layers, panelOpen },
   ref,
 ) {
   const fgRef = useRef<L.FeatureGroup | null>(null);
@@ -443,6 +444,7 @@ const AquaMapInner = forwardRef<AquaMapHandle, Props>(function AquaMapInner(
       <MapFabsInner
         onOpenLayers={onOpenLayers}
         onStartDraw={() => startDrawRef.current?.()}
+        shifted={panelOpen}
       />
     </MapContainer>
   );
@@ -456,6 +458,7 @@ export const AquaMap = memo(AquaMapInner, (prev, next) => {
   return (
     prev.layers.dem === next.layers.dem &&
     prev.layers.waterEvolution === next.layers.waterEvolution &&
-    prev.layers.sarUrban === next.layers.sarUrban
+    prev.layers.sarUrban === next.layers.sarUrban &&
+    prev.panelOpen === next.panelOpen
   );
 });
