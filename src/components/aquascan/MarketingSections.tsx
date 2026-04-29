@@ -586,35 +586,109 @@ export const MarketingSections = () => {
 
       {/* SECTION 5 — BUSINESS */}
       <section id="business" className="scroll-mt-24 bg-[#030712] py-24 px-6 border-t border-white/5">
-        <motion.h2
-          {...fadeUp}
-          className="text-center text-white font-semibold uppercase mb-16 text-3xl md:text-4xl tracking-[0.18em] [text-shadow:0_0_24px_rgba(34,211,238,0.18)]"
-        >
-          SaaS Financial Model
-        </motion.h2>
-        <motion.div {...fadeUp} className="liquid-glass rounded-3xl p-12 max-w-5xl mx-auto border border-white/5 transition-all duration-300 hover:-translate-y-1 hover:border-cyan-500/30 hover:shadow-[0_0_30px_-5px_rgba(34,211,238,0.25)]">
-          <div className="flex flex-col md:flex-row items-center justify-around gap-12 md:gap-6">
+        <div className="mx-auto max-w-6xl">
+          <motion.div {...fadeUp} className="text-center mb-14">
+            <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-cyan-400/80">
+              Model de Business · Go-to-Market
+            </p>
+            <h2 className="mt-3 text-3xl md:text-4xl font-semibold tracking-tight text-white">
+              Țintele Comerciale &amp; Entitățile Legale
+            </h2>
+            <p className="mt-4 mx-auto max-w-2xl text-sm md:text-base text-white/55 leading-relaxed">
+              Trei vectori de adoptare: instituțional (B2G), proiectanți privați (B2B) și
+              consultanță internațională.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {[
-              { num: "15k EUR", label: "Annual AWS Cloud Cost (PostGIS/EC2)" },
-              { num: "60k EUR", label: "Pilot Development Budget (3 engineers, 6 months)" },
-              { num: "3,000 EUR", label: "Estimated B2B License / month / agency" },
-            ].map((s) => (
-              <div key={s.num} className="text-center">
-                <div className="font-mono text-4xl md:text-5xl text-white font-bold tracking-tight tabular-nums [text-shadow:0_0_24px_rgba(34,211,238,0.35)]">
-                  {s.num}
+              {
+                tag: "B2G · Instituțional",
+                tone: "from-cyan-400/15 to-cyan-400/0 border-cyan-400/30",
+                entity: "Administrația Națională „Apele Române” (ANAR)",
+                contact: "Director General Ing. Sorin Lucaci (sau echivalent tehnic regional)",
+                use: "Validarea automată a avizelor de gospodărire a apelor.",
+              },
+              {
+                tag: "B2B · Proiectanți Privați",
+                tone: "from-emerald-400/15 to-emerald-400/0 border-emerald-400/30",
+                entity: "ISPH S.A. (Institutul de Studii și Proiectări Hidroenergetice) · Aquaproiect S.A.",
+                contact: "Departament Tehnic / Director Proiectare",
+                use: "Principalii proiectanți de infrastructură — pot reduce costurile de teren cu până la 70%.",
+              },
+              {
+                tag: "Consultanță Internațională",
+                tone: "from-amber-400/15 to-amber-400/0 border-amber-400/30",
+                entity: "Tractebel Engineering Romania (Grupul ENGIE)",
+                contact: "Manager Proiecte Hidro",
+                use: "Validare cross-border și deployment pe proiecte EU finanțate.",
+              },
+            ].map((c, i) => (
+              <motion.div
+                key={c.tag}
+                {...fadeUp}
+                transition={{ ...fadeUp.transition, delay: i * 0.08 }}
+                className="rounded-3xl border border-white/10 bg-slate-950/75 p-7 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/30 hover:[box-shadow:0_0_30px_-5px_rgba(34,211,238,0.3)]"
+              >
+                <span
+                  className={`inline-flex items-center rounded-full border bg-gradient-to-r ${c.tone} px-3 py-1 font-mono text-[9.5px] uppercase tracking-[0.22em] text-white/85`}
+                >
+                  {c.tag}
+                </span>
+                <h3 className="mt-5 text-base font-semibold text-white leading-snug">
+                  {c.entity}
+                </h3>
+                <div className="mt-4 flex flex-col gap-3 border-t border-white/5 pt-4">
+                  <div>
+                    <p className="font-mono text-[9.5px] uppercase tracking-[0.2em] text-cyan-400/70">
+                      Contact vizat
+                    </p>
+                    <p className="mt-1 text-[12.5px] text-white/80 leading-relaxed">
+                      {c.contact}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="font-mono text-[9.5px] uppercase tracking-[0.2em] text-cyan-400/70">
+                      Utilitate
+                    </p>
+                    <p className="mt-1 text-[12.5px] text-white/65 leading-relaxed">
+                      {c.use}
+                    </p>
+                  </div>
                 </div>
-                <div className="text-white/60 text-sm mt-4 max-w-[200px] mx-auto leading-snug">
-                  {s.label}
-                </div>
-              </div>
+              </motion.div>
             ))}
           </div>
-          <p className="text-center text-white/80 mt-12 max-w-2xl mx-auto leading-relaxed">
-            <span className="text-cyan-300 font-medium">Immediate ROI:</span> Eliminates 6
-            months of manual topographical field surveys (average cost &gt;20,000 EUR
-            according to SEAP public procurements).
-          </p>
-        </motion.div>
+
+          {/* Financial baseline strip */}
+          <motion.div
+            {...fadeUp}
+            transition={{ ...fadeUp.transition, delay: 0.25 }}
+            className="liquid-glass mt-10 rounded-3xl p-10 border border-white/5 transition-all duration-300 hover:border-cyan-500/30 hover:shadow-[0_0_30px_-5px_rgba(34,211,238,0.25)]"
+          >
+            <div className="flex flex-col md:flex-row items-center justify-around gap-10 md:gap-6">
+              {[
+                { num: "15k EUR", label: "Cost anual AWS Cloud (PostGIS/EC2)" },
+                { num: "60k EUR", label: "Buget pilot (3 ingineri · 6 luni)" },
+                { num: "3.000 EUR", label: "Licență B2B estimată / lună / agenție" },
+              ].map((s) => (
+                <div key={s.num} className="text-center">
+                  <div className="font-mono text-3xl md:text-4xl text-white font-bold tracking-tight tabular-nums [text-shadow:0_0_24px_rgba(34,211,238,0.35)]">
+                    {s.num}
+                  </div>
+                  <div className="text-white/55 text-xs mt-3 max-w-[200px] mx-auto leading-snug">
+                    {s.label}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <p className="text-center text-white/75 text-sm mt-8 max-w-2xl mx-auto leading-relaxed">
+              <span className="text-cyan-300 font-medium">ROI imediat:</span> elimină 6
+              luni de prospecții topografice manuale (cost mediu &gt; 20.000 EUR conform
+              achizițiilor publice SEAP).
+            </p>
+          </motion.div>
+        </div>
       </section>
 
       {/* SECTION 6 — BIBLIOGRAFIE */}
