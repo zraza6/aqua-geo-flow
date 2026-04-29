@@ -143,6 +143,26 @@ function InteractiveTerrain() {
   );
 }
 
+/* ------------ Interactive Tech Chip with hover tooltip + glow ------------ */
+function TechChip({ name, tip }: { name: string; tip: string }) {
+  return (
+    <motion.span
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.97 }}
+      transition={{ type: "spring", stiffness: 350, damping: 22 }}
+      className="group relative inline-block cursor-pointer rounded-full border border-white/10 bg-slate-950/75 px-3.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-white/75 backdrop-blur-xl transition-colors hover:border-cyan-400/50 hover:text-cyan-300 hover:[box-shadow:0_0_22px_-4px_rgba(34,211,238,0.65)]"
+    >
+      {name}
+      <span
+        role="tooltip"
+        className="pointer-events-none absolute left-1/2 top-full z-20 mt-2 w-max max-w-[220px] -translate-x-1/2 translate-y-1 rounded-lg border border-white/10 bg-slate-950/95 px-3 py-1.5 text-[10.5px] font-light normal-case tracking-normal text-white/85 opacity-0 backdrop-blur-xl shadow-[0_8px_24px_rgba(0,0,0,0.5),0_0_18px_-4px_rgba(34,211,238,0.4)] transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100"
+      >
+        {tip}
+      </span>
+    </motion.span>
+  );
+}
+
 export const MarketingSections = () => {
   return (
     <>
@@ -174,17 +194,22 @@ export const MarketingSections = () => {
           <motion.h1
             {...fadeUp}
             transition={{ ...fadeUp.transition, delay: 0.05 }}
-            className="mt-6 bg-gradient-to-br from-white via-white to-cyan-200/80 bg-clip-text text-5xl font-bold tracking-tight text-transparent sm:text-6xl md:text-7xl"
+            className="mt-6 bg-gradient-to-br from-white via-white to-cyan-200/80 bg-clip-text text-5xl font-bold text-transparent sm:text-6xl md:text-7xl"
+            style={{ letterSpacing: "-0.02em", fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}
           >
-            HeavyWater
-            <span className="mt-2 block text-2xl font-light tracking-[0.04em] text-white/55 sm:text-3xl md:text-4xl">
-              Architecture Analysis
+            Aqua Scan
+            <span
+              className="mt-3 block text-xl font-light text-white/55 sm:text-2xl md:text-3xl"
+              style={{ letterSpacing: "-0.01em" }}
+            >
+              HeavyWater Architecture Analysis
             </span>
           </motion.h1>
           <motion.p
             {...fadeUp}
             transition={{ ...fadeUp.transition, delay: 0.1 }}
-            className="mx-auto mt-8 max-w-2xl text-base leading-relaxed text-white/70"
+            className="mx-auto mt-10 max-w-2xl text-lg leading-relaxed text-white/75 md:text-xl"
+            style={{ letterSpacing: "-0.02em" }}
           >
             A Spatial Data Science platform for the technical and legal{" "}
             <strong className="font-semibold text-white">pre-feasibility</strong> of
@@ -194,7 +219,8 @@ export const MarketingSections = () => {
           <motion.p
             {...fadeUp}
             transition={{ ...fadeUp.transition, delay: 0.15 }}
-            className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-white/50"
+            className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-white/55 md:text-lg"
+            style={{ letterSpacing: "-0.015em" }}
           >
             Reducing feasibility studies from{" "}
             <span className="text-white/80">months of field work</span> to{" "}
@@ -205,18 +231,18 @@ export const MarketingSections = () => {
           <motion.div
             {...fadeUp}
             transition={{ ...fadeUp.transition, delay: 0.22 }}
-            className="mx-auto mt-10 flex flex-wrap justify-center gap-2.5"
+            className="mx-auto mt-12 flex flex-wrap justify-center gap-2.5"
           >
-            {["Python", "GeoPandas", "NetCDF4", "Copernicus API", "PostGIS", "Earth Engine"].map(
-              (t) => (
-                <span
-                  key={t}
-                  className="rounded-full border border-white/10 bg-slate-950/75 px-3.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-white/70 backdrop-blur-xl transition-all hover:border-cyan-400/40 hover:text-cyan-300 hover:[box-shadow:0_0_18px_-4px_rgba(34,211,238,0.5)]"
-                >
-                  {t}
-                </span>
-              ),
-            )}
+            {[
+              { name: "Python", tip: "Core processing engine." },
+              { name: "GeoPandas", tip: "Vector data manipulation." },
+              { name: "NetCDF4", tip: "Multi-dimensional climate arrays." },
+              { name: "Copernicus API", tip: "Sentinel & CLMS data access." },
+              { name: "PostGIS", tip: "Spatial database management." },
+              { name: "Earth Engine", tip: "Satellite imagery compute." },
+            ].map((t) => (
+              <TechChip key={t.name} name={t.name} tip={t.tip} />
+            ))}
           </motion.div>
         </div>
       </section>
