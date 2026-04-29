@@ -129,6 +129,71 @@ function MapTuning() {
   const map = useMap();
   useEffect(() => {
     map.attributionControl.setPrefix("");
+
+    // === Click-to-focus scroll wheel zoom ===
+    // Disabled by default; enabled for 4s after the user clicks the map.
+    map.scrollWheelZoom.disable();
+    const container = map.getContainer();
+    let timeout: number | null = null;
+    const enableTemporarily = () => {
+      map.scrollWheelZoom.enable();
+      container.classList.add("ring-2", "ring-cyan-400/30");
+      if (timeout) window.clearTimeout(timeout);
+      timeout = window.setTimeout(() => {
+        map.scrollWheelZoom.disable();
+        container.classList.remove("ring-2", "ring-cyan-400/30");
+      }, 4000);
+    };
+    const disableNow = () => {
+      if (timeout) window.clearTimeout(timeout);
+      map.scrollWheelZoom.disable();
+      container.classList.remove("ring-2", "ring-cyan-400/30");
+    };
+    container.addEventListener("mousedown", enableTemporarily);
+    container.addEventListener("mouseleave", disableNow);
+
+    // === Right-click pan + suppress context menu ===
+    // Leaflet default drag is left-click. We add a right-click drag-to-pan and
+    // suppress the browser context menu so it never interferes with drawing.
+    const onContextMenu = (e: Event) => e.preventDefault();
+    container.addEventListener("contextmenu", onContextMenu);
+
+    let panning = false;
+    let lastX = 0;
+    let lastY = 0;
+    const onMouseDown = (e: MouseEvent) => {
+      if (e.button !== 2) return; // right click only
+      panning = true;
+      lastX = e.clientX;
+      lastY = e.clientY;
+      container.style.cursor = "grabbing";
+    };
+    const onMouseMove = (e: MouseEvent) => {
+      if (!panning) return;
+      const dx = e.clientX - lastX;
+      const dy = e.clientY - lastY;
+      lastX = e.clientX;
+      lastY = e.clientY;
+      map.panBy([-dx, -dy], { animate: false });
+    };
+    const onMouseUp = (e: MouseEvent) => {
+      if (e.button !== 2) return;
+      panning = false;
+      container.style.cursor = "";
+    };
+    container.addEventListener("mousedown", onMouseDown);
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+
+    return () => {
+      if (timeout) window.clearTimeout(timeout);
+      container.removeEventListener("mousedown", enableTemporarily);
+      container.removeEventListener("mouseleave", disableNow);
+      container.removeEventListener("contextmenu", onContextMenu);
+      container.removeEventListener("mousedown", onMouseDown);
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+    };
   }, [map]);
   return null;
 }
@@ -359,15 +424,38 @@ const AquaMapInner = forwardRef<AquaMapHandle, Props>(function AquaMapInner(
     [onPolygonComplete],
   );
 
-  /** Click anywhere on the map → spawn a small Custom Point AOI and analyze it. */
+  /** Left-click anywhere on the map → drop a subtle Inspection Marker → Location Intelligence mode. */
   const onMapClick = useMemo(
     () => (e: L.LeafletMouseEvent) => {
-      // Ignore clicks that already hit a polygon (Leaflet bubbles up otherwise)
+      // Ignore clicks on existing interactive layers
       const target = e.originalEvent?.target as HTMLElement | null;
       if (target?.closest?.(".leaflet-interactive")) return;
+      // Only left-click (right-click is reserved for panning)
+      if (e.originalEvent && (e.originalEvent as MouseEvent).button !== 0) return;
 
       const { lat, lng } = e.latlng;
-      // ~1.5 km half-side at the equator; latitude scales fine, longitude scales by cos(lat)
+      // Subtle inspection marker — small cyan ring, NOT an AOI polygon
+      const inspector = L.circleMarker([lat, lng], {
+        radius: 8,
+        weight: 2,
+        color: "#22d3ee",
+        fillColor: "#22d3ee",
+        fillOpacity: 0.35,
+        className: "inspection-marker-pulse",
+      });
+      const tinyHalo = L.circleMarker([lat, lng], {
+        radius: 16,
+        weight: 0,
+        fillColor: "#22d3ee",
+        fillOpacity: 0.12,
+      });
+      if (fgRef.current) {
+        fgRef.current.addLayer(tinyHalo);
+        fgRef.current.addLayer(inspector);
+      }
+      drawnLayersRef.current.push(inspector as unknown as L.Polygon);
+      drawnLayersRef.current.push(tinyHalo as unknown as L.Polygon);
+      // Build a tiny implicit AOI (~1.5km) only so that downstream sims have geometry
       const dLat = 0.012;
       const dLng = 0.012 / Math.max(Math.cos((lat * Math.PI) / 180), 0.15);
       const ring: [number, number][] = [
@@ -376,13 +464,7 @@ const AquaMapInner = forwardRef<AquaMapHandle, Props>(function AquaMapInner(
         [lat + dLat, lng + dLng],
         [lat + dLat, lng - dLng],
       ];
-      const poly = L.polygon(ring, DRAWN_STYLE);
-      const marker = L.marker([lat, lng]);
-      if (fgRef.current) {
-        fgRef.current.addLayer(poly);
-        fgRef.current.addLayer(marker);
-      }
-      drawnLayersRef.current.push(poly);
+      const poly = L.polygon(ring, { ...DRAWN_STYLE, opacity: 0, fillOpacity: 0 });
       activeLayerRef.current = poly;
       const area = polygonAreaKm2(poly.getLatLngs()[0] as L.LatLng[]);
       onPolygonComplete({ layer: poly, areaKm2: area, source: "drawn" });
@@ -397,7 +479,7 @@ const AquaMapInner = forwardRef<AquaMapHandle, Props>(function AquaMapInner(
       minZoom={2}
       maxZoom={17}
       zoomControl={false}
-      scrollWheelZoom={false}
+      scrollWheelZoom={true}
       className="h-full w-full z-0"
       worldCopyJump
     >

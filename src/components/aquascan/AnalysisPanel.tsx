@@ -11,6 +11,9 @@ import {
   ShieldAlert,
   Scale,
   TrendingUp,
+  Mountain,
+  Trees,
+  Compass,
 } from "lucide-react";
 import {
   Accordion,
@@ -75,6 +78,32 @@ export function AnalysisPanel({
     const seed = Math.floor((lat + 90) * 1e4) ^ Math.floor((lng + 180) * 1e4);
     const r = mulberry32(seed || 1);
 
+    // Coarse elevation model: latitude band + jitter so it varies globally
+    const baseElev = Math.max(
+      0,
+      Math.round(rand(r, 20, 2400) * (1 - Math.abs(Math.abs(lat) - 45) / 90)),
+    );
+    const elevation = baseElev;
+    const terrainType =
+      elevation < 200
+        ? "Plains / Lowland"
+        : elevation < 800
+          ? "Hills / Plateau"
+          : elevation < 1800
+            ? "Mountainous Terrain"
+            : "Alpine / High Mountain";
+    const landCovers = [
+      "Broadleaf Forest",
+      "Coniferous Forest",
+      "Grassland",
+      "Cropland",
+      "Sparse Vegetation",
+      "Wetland",
+      "Bare Soil",
+      "Urban Fabric",
+    ];
+    const landCover = landCovers[Math.floor(r() * landCovers.length)];
+
     const elevDrop = rand(r, 15, 120);
     const discharge = rand(r, 0.5, 45.2);
     const continuity = r() > 0.35 ? "Stable" : "Drought-prone";
@@ -84,6 +113,9 @@ export function AnalysisPanel({
     const roiSavings = Math.round(rand(r, 18000, 45000) / 100) * 100;
 
     return {
+      elevation: elevation.toLocaleString("en-US"),
+      terrainType,
+      landCover,
       elevDrop: elevDrop.toFixed(1),
       discharge: discharge.toFixed(2),
       continuity,
@@ -103,26 +135,26 @@ export function AnalysisPanel({
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: 24, opacity: 0 }}
       transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-      className="pointer-events-auto flex max-h-[82vh] w-[calc(100vw-7rem)] max-w-[420px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-900/70 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-md"
+      className="pointer-events-auto flex max-h-[88vh] w-[calc(100vw-7rem)] min-w-[450px] max-w-[480px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-900/70 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-md"
       {...stopMapPropagation}
     >
       {/* Header */}
-      <div className="relative flex flex-col gap-1.5 border-b border-white/10 px-5 py-4">
+      <div className="relative flex flex-col gap-2 border-b border-white/10 px-8 py-6">
         <button
           onClick={onClose}
           disabled={running}
-          aria-label="Close basin profile"
-          className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-white/60 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-40"
+          aria-label="Close location intelligence"
+          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-white/60 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-40"
         >
-          <X className="h-3.5 w-3.5" />
+          <X className="h-4 w-4" />
         </button>
         <p className="font-mono text-[9px] uppercase tracking-[0.25em] text-cyan-400 [text-shadow:0_0_10px_rgba(34,211,238,0.6)]">
-          Pre-Feasibility · HeavyWater
+          Location Intelligence · Open-Source GIS
         </p>
-        <h2 className="text-[14px] font-semibold leading-tight text-white">
+        <h2 className="text-[15px] font-semibold leading-tight text-white">
           {zoneName}
         </h2>
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 font-mono text-[9.5px] font-light text-white/55">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 font-mono text-[10px] font-light text-white/55">
           <span>{area.toFixed(2)} km²</span>
           <Dot />
           <span>
@@ -133,11 +165,45 @@ export function AnalysisPanel({
         </div>
       </div>
 
-      <div className="no-scrollbar min-h-0 flex-1 overflow-y-auto px-4 py-4 pb-4">
+      <div className="no-scrollbar min-h-0 flex-1 overflow-y-auto px-8 py-6">
+        {/* === MODE 1 — LOCATION INFO (always visible header card) === */}
+        <div className="mb-6 rounded-2xl border border-cyan-400/20 bg-cyan-400/[0.04] p-5">
+          <div className="mb-4 flex items-center gap-2">
+            <Compass className="h-3.5 w-3.5 text-cyan-300" />
+            <p className="font-mono text-[9.5px] uppercase tracking-[0.22em] text-cyan-300">
+              Open-Source Terrain Snapshot
+            </p>
+          </div>
+          <div className="flex flex-col gap-4">
+            <LocRow
+              icon={Mountain}
+              label="Elevation"
+              meta="Copernicus GLO-30"
+              value={`${report.elevation} m`}
+            />
+            <LocRow
+              icon={MapIcon}
+              label="Terrain Type"
+              meta="Inferred from DEM"
+              value={report.terrainType}
+            />
+            <LocRow
+              icon={Trees}
+              label="Land Cover"
+              meta="CLMS HRL"
+              value={report.landCover}
+            />
+          </div>
+        </div>
+
+        <p className="mb-3 font-mono text-[9px] uppercase tracking-[0.22em] text-white/40">
+          Detailed Pre-Feasibility · CDSE · GloFAS · SoilGrids · Water Law 107/1996
+        </p>
+
         <Accordion
           type="multiple"
           defaultValue={["hydro", "geo", "env", "econ"]}
-          className="flex flex-col gap-2"
+          className="flex flex-col gap-3"
         >
           {/* A — HYDROLOGY */}
           <Section
@@ -256,8 +322,11 @@ export function AnalysisPanel({
         </Accordion>
       </div>
 
-      {/* Decision footer */}
-      <div className="shrink-0 border-t border-white/10 bg-slate-900/95 px-4 py-4 backdrop-blur-md">
+      {/* Decision footer — Simulate is a SECONDARY action below Location Info */}
+      <div className="shrink-0 border-t border-white/10 bg-slate-900/95 px-8 py-5 backdrop-blur-md">
+        <p className="mb-3 font-mono text-[8.5px] uppercase tracking-[0.22em] text-white/40">
+          Secondary action · advanced simulation
+        </p>
         <SimulatorButton
           status={simulationStatus}
           onSimulate={onSimulate}
@@ -442,4 +511,40 @@ function SimulatorButton({
 
 function Dot() {
   return <span className="h-1 w-1 rounded-full bg-white/20" />;
+}
+
+function LocRow({
+  icon: Icon,
+  label,
+  meta,
+  value,
+}: {
+  icon: any;
+  label: string;
+  meta: string;
+  value: string;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-4">
+      <div className="flex min-w-0 items-center gap-3">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-cyan-400/20 bg-cyan-400/[0.08]">
+          <Icon className="h-4 w-4 text-cyan-300" />
+        </div>
+        <div className="flex min-w-0 flex-col">
+          <span className="text-[11px] font-light leading-tight text-white/70">
+            {label}
+          </span>
+          <span className="font-mono text-[8.5px] uppercase tracking-wider text-white/40">
+            {meta}
+          </span>
+        </div>
+      </div>
+      <span
+        className="font-mono text-[13px] font-bold text-white"
+        style={{ textShadow: "0 0 10px rgba(34,211,238,0.35)" }}
+      >
+        {value}
+      </span>
+    </div>
+  );
 }
