@@ -7,10 +7,11 @@ import { GLASS, stopMapPropagation } from "./stopMap";
 interface FabsProps {
   onOpenLayers: () => void;
   onStartDraw: () => void;
+  shifted?: boolean;
 }
 
 /** Inner controls — must be inside <MapContainer> so useMap() works. */
-export function MapFabsInner({ onOpenLayers, onStartDraw }: FabsProps) {
+export function MapFabsInner({ onOpenLayers, onStartDraw, shifted }: FabsProps) {
   const map = useMap();
   const wrapRef = useRef<HTMLDivElement | null>(null);
 
@@ -24,7 +25,10 @@ export function MapFabsInner({ onOpenLayers, onStartDraw }: FabsProps) {
   return (
     <div
       ref={wrapRef}
-      className="absolute bottom-24 right-3 z-[1000] flex flex-col gap-2.5 sm:bottom-6 sm:right-6"
+      style={{ transition: "right 300ms cubic-bezier(0.4,0,0.2,1)" }}
+      className={`absolute bottom-24 z-[1000] flex flex-col gap-2.5 sm:bottom-6 ${
+        shifted ? "right-[26.5rem]" : "right-3 sm:right-6"
+      }`}
       {...stopMapPropagation}
     >
       <Fab label="Layers" onClick={onOpenLayers} accent>
