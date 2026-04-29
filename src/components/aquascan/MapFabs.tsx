@@ -27,7 +27,7 @@ export function MapFabsInner({ onOpenLayers, onStartDraw, shifted }: FabsProps) 
       ref={wrapRef}
       style={{ transition: "right 300ms cubic-bezier(0.4,0,0.2,1)" }}
       className={`absolute bottom-24 z-[1000] flex flex-col gap-2.5 sm:bottom-6 ${
-        shifted ? "right-[26.5rem]" : "right-3 sm:right-6"
+        shifted ? "right-[30rem]" : "right-3 sm:right-6"
       }`}
       {...stopMapPropagation}
     >
