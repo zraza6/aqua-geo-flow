@@ -21,7 +21,7 @@ import { CommandHub, type CommandTab } from "@/components/aquascan/CommandHub";
 import { ContextPanel } from "@/components/aquascan/ContextPanel";
 import { stopMapPropagation } from "@/components/aquascan/stopMap";
 import { MarketingSections } from "@/components/aquascan/MarketingSections";
-import { SubNavPill } from "@/components/aquascan/SubNavPill";
+import { FloatingNavMenu } from "@/components/aquascan/FloatingNavMenu";
 
 interface SelectedBasin {
   id: string;
@@ -280,15 +280,13 @@ const Index = () => {
         </button>
 
         {analyzing && <LoadingOverlay />}
-
-        {/* SUB-NAV PILL — bottom center of hero map */}
-        <div className="pointer-events-none absolute bottom-6 left-1/2 z-[1100] -translate-x-1/2">
-          <SubNavPill />
-        </div>
       </div>
 
       {/* === SCROLLABLE LANDING SECTIONS === */}
       <MarketingSections />
+
+      {/* GLOBAL FLOATING NAV — bottom-right circular toggle */}
+      <FloatingNavMenu />
     </main>
   );
 };

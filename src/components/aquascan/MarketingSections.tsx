@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { motion, useMotionValue, useTransform } from "framer-motion";
 import { useEffect, useRef } from "react";
+import { SubNavPill } from "./SubNavPill";
 
 const fadeUp = {
   initial: { opacity: 0, y: 30 },
@@ -174,7 +175,12 @@ function TechChip({ name, tip }: { name: string; tip: string }) {
 export const MarketingSections = () => {
   return (
     <>
-      {/* SECTION 0 — HERO / BRAND INTRO */}
+      {/* SUB-NAV PILL — sits on the dark blue background directly below the hero */}
+      <div className="sticky top-4 z-[60] flex justify-center px-4 pt-4">
+        <SubNavPill />
+      </div>
+
+      {/* SECTION 1 — INTRODUCERE */}
       <section id="introducere" className="relative scroll-mt-24 overflow-hidden border-t border-white/5 bg-[#030712] px-6 py-28">
         <div
           className="pointer-events-none absolute inset-0 opacity-40"
@@ -261,8 +267,8 @@ export const MarketingSections = () => {
         </div>
       </section>
 
-      {/* SECTION 0b — DATA & ALGORITHMS */}
-      <section id="date-utilizate" className="scroll-mt-24 border-t border-white/5 bg-[#030712] px-6 py-24">
+      {/* SECTION 2 — DATE ȘI ALGORITMI */}
+      <section id="date-algoritmi" className="scroll-mt-24 border-t border-white/5 bg-[#030712] px-6 py-24">
         <motion.div {...fadeUp} className="mx-auto max-w-6xl">
           <div className="mb-12 text-center">
             <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-cyan-400/80">
@@ -308,7 +314,7 @@ export const MarketingSections = () => {
               </ul>
             </div>
 
-            <div id="algoritmi" className="scroll-mt-24 rounded-3xl border border-white/10 bg-slate-950/75 p-8 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/30 hover:[box-shadow:0_0_30px_-5px_rgba(34,211,238,0.3)]">
+            <div className="rounded-3xl border border-white/10 bg-slate-950/75 p-8 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/30 hover:[box-shadow:0_0_30px_-5px_rgba(34,211,238,0.3)]">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-cyan-400/30 bg-cyan-400/10">
                   <Workflow className="h-5 w-5 text-cyan-300" />
@@ -359,8 +365,8 @@ export const MarketingSections = () => {
         </motion.div>
       </section>
 
-      {/* SECTION A — PRODUCT SYNERGY */}
-      <section id="produs" className="scroll-mt-24 bg-[#030712] py-24 px-6">
+      {/* SECTION 3 — ARHITECTURA PRODUSULUI */}
+      <section id="arhitectura" className="scroll-mt-24 bg-[#030712] py-24 px-6">
         <motion.h2
           {...fadeUp}
           className="text-4xl font-semibold text-white/90 text-center mb-4 tracking-tight"
@@ -465,8 +471,8 @@ export const MarketingSections = () => {
         </motion.div>
       </section>
 
-      {/* SECTION B — ROADMAP */}
-      <section id="roadmap" className="scroll-mt-24 bg-[#030712] py-24 px-6">
+      {/* SECTION 4 — SCALING & FUTURE CAPABILITIES */}
+      <section id="scaling" className="scroll-mt-24 bg-[#030712] py-24 px-6">
         <motion.h2
           {...fadeUp}
           className="text-3xl text-white/90 text-center mb-16 font-semibold tracking-tight"
@@ -507,9 +513,8 @@ export const MarketingSections = () => {
         </div>
       </section>
 
-      {/* SECTION C — ENTERPRISE ECONOMICS */}
-      <section id="economics" className="scroll-mt-24 bg-[#030712] py-24 px-6 border-t border-white/5">
-        <span id="business-finante" className="block -mt-24 pt-24" aria-hidden="true" />
+      {/* SECTION 5 — BUSINESS */}
+      <section id="business" className="scroll-mt-24 bg-[#030712] py-24 px-6 border-t border-white/5">
         <motion.h2
           {...fadeUp}
           className="text-center text-white font-semibold uppercase mb-16 text-3xl md:text-4xl tracking-[0.18em] [text-shadow:0_0_24px_rgba(34,211,238,0.18)]"
@@ -541,8 +546,8 @@ export const MarketingSections = () => {
         </motion.div>
       </section>
 
-      {/* SECTION D — BIBLIOGRAPHY FOOTER */}
-      <footer className="bg-[#030712] py-20 px-6 border-t border-white/5">
+      {/* SECTION 6 — BIBLIOGRAFIE */}
+      <footer id="bibliografie" className="scroll-mt-24 bg-[#030712] py-20 px-6 border-t border-white/5">
         <motion.div {...fadeUp} className="max-w-3xl mx-auto">
           <div className="flex items-center gap-2 mb-8">
             <BookOpen className="h-4 w-4 text-cyan-400/80" />
