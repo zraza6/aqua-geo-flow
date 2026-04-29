@@ -509,6 +509,7 @@ export const MarketingSections = () => {
 
       {/* SECTION C — ENTERPRISE ECONOMICS */}
       <section id="economics" className="scroll-mt-24 bg-[#030712] py-24 px-6 border-t border-white/5">
+        <span id="business-finante" className="block -mt-24 pt-24" aria-hidden="true" />
         <motion.h2
           {...fadeUp}
           className="text-center text-white font-semibold uppercase mb-16 text-3xl md:text-4xl tracking-[0.18em] [text-shadow:0_0_24px_rgba(34,211,238,0.18)]"
