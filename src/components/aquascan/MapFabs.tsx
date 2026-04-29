@@ -7,11 +7,10 @@ import { GLASS, stopMapPropagation } from "./stopMap";
 interface FabsProps {
   onOpenLayers: () => void;
   onStartDraw: () => void;
-  shifted?: boolean;
 }
 
 /** Inner controls — must be inside <MapContainer> so useMap() works. */
-export function MapFabsInner({ onOpenLayers, onStartDraw, shifted }: FabsProps) {
+export function MapFabsInner({ onOpenLayers, onStartDraw }: FabsProps) {
   const map = useMap();
   const wrapRef = useRef<HTMLDivElement | null>(null);
 

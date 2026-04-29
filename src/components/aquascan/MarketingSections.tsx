@@ -33,29 +33,30 @@ function InteractiveTerrain() {
   const curveY = (xv: number) =>
     180 - 92 * Math.sin((xv / W) * Math.PI * 1.4) - 28 * Math.sin((xv / W) * Math.PI * 3.2);
 
-  const dotY = useTransform(x, (xv) => curveY(xv));
-  const ksat = useTransform(x, (xv) => (15.4 + (xv / W) * (38.0 - 15.4)).toFixed(1));
-  const elev = useTransform(x, (xv) => Math.round(450 + ((H - curveY(xv)) / H) * (1200 - 450)).toString());
+  const clampX = (xv: number) => Math.min(W, Math.max(0, xv));
+  const dotY = useTransform(x, (xv) => curveY(clampX(xv)));
+  const ksat = useTransform(x, (xv) => (15.4 + (clampX(xv) / W) * (38.0 - 15.4)).toFixed(1));
+  const elev = useTransform(x, (xv) => Math.round(450 + ((H - curveY(clampX(xv))) / H) * (1200 - 450)).toString());
   const risk = useTransform(x, (xv) => {
-    const v = 15.4 + (xv / W) * (38.0 - 15.4);
+    const v = 15.4 + (clampX(xv) / W) * (38.0 - 15.4);
     if (v > 30) return "Critical Seepage";
     if (v > 20) return "High Seepage";
     return "Stable";
   });
   const rec = useTransform(x, (xv) => {
-    const v = 15.4 + (xv / W) * (38.0 - 15.4);
+    const v = 15.4 + (clampX(xv) / W) * (38.0 - 15.4);
     if (v > 30) return "HDPE + Bentonite";
     if (v > 20) return "HDPE Liner";
     return "Compacted Clay";
   });
 
-  // Build the polyline string for the SVG curve.
-  const points = (() => {
+  // Build a visually smooth SVG path from the exact same formula that drives the locked node.
+  const terrainPath = (() => {
     const pts: string[] = [];
-    for (let i = 0; i <= W; i += 4) pts.push(`${i},${curveY(i).toFixed(2)}`);
-    return pts.join(" ");
+    for (let i = 0; i <= W; i += 2) pts.push(`${i.toFixed(2)} ${curveY(i).toFixed(2)}`);
+    return `M ${pts.join(" L ")}`;
   })();
-  const fillPoints = `0,${H} ${points} ${W},${H}`;
+  const fillPath = `${terrainPath} L ${W} ${H} L 0 ${H} Z`;
 
   return (
     <div className="relative h-[420px] rounded-2xl overflow-hidden border border-white/5 bg-gradient-to-br from-slate-900 via-slate-950 to-black">
@@ -110,9 +111,9 @@ function InteractiveTerrain() {
             <stop offset="100%" stopColor="rgba(34,211,238,0)" />
           </linearGradient>
         </defs>
-        <polygon points={fillPoints} fill="url(#terrainFill)" />
-        <polyline
-          points={points}
+        <path d={fillPath} fill="url(#terrainFill)" />
+        <path
+          d={terrainPath}
           fill="none"
           stroke="rgba(34,211,238,0.95)"
           strokeWidth="2"
@@ -357,7 +358,7 @@ export const MarketingSections = () => {
           {...fadeUp}
           className="text-4xl font-semibold text-white/90 text-center mb-4 tracking-tight"
         >
-          AquaScan Interface. HeavyWater Engine.
+          Aqua Scan <span className="text-cyan-400">Pro</span> Interface. HeavyWater Engine.
         </motion.h2>
         <motion.p
           {...fadeUp}
@@ -374,7 +375,9 @@ export const MarketingSections = () => {
             className="liquid-glass rounded-3xl p-8 lg:col-span-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_30px_-5px_rgba(34,211,238,0.3)]"
           >
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-white/90 text-lg font-medium">UI: AquaScan</h3>
+          <h3 className="text-white/90 text-lg font-medium">
+            UI: Aqua Scan <span className="text-cyan-400">Pro</span>
+          </h3>
               <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-cyan-400/80">
                 Interactive · GIS Layer
               </span>
@@ -430,7 +433,7 @@ export const MarketingSections = () => {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
               </span>
-              <h3 className="text-white/90 text-sm font-medium">Live Telemetry Feed</h3>
+            <h3 className="text-white/90 text-sm font-medium">Live Data Stream</h3>
             </div>
             <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-emerald-400/80">
               streaming · stdout
@@ -438,10 +441,10 @@ export const MarketingSections = () => {
           </div>
           <div className="rounded-2xl bg-black/60 border border-white/5 p-4 font-mono text-[12px] leading-relaxed text-white/75 max-h-44 overflow-hidden">
             {[
-              { t: "19:24:01", msg: "Fetching GLO-30 DEM tile [N46_E023]…", tail: "OK", tone: "text-emerald-400" },
-              { t: "19:24:02", msg: "Querying SoilGrids Ksat layer…", tail: "22.4 mm/h", tone: "text-cyan-300" },
+              { t: "19:24:01", msg: "Querying GLO-30 DEM…", tail: "OK", tone: "text-emerald-400" },
+              { t: "19:24:02", msg: "SoilGrids v2.0 Sync…", tail: "Ksat 22.4 mm/h", tone: "text-cyan-300" },
               { t: "19:24:03", msg: "Calculating Dijkstra optimal path…", tail: "score 82.4", tone: "text-amber-300" },
-              { t: "19:24:04", msg: "InSAR Stability Check (EGMS L3)…", tail: "OK · -2.1 mm/yr", tone: "text-emerald-400" },
+              { t: "19:24:04", msg: "InSAR Stability Check…", tail: "OK · -2.1 mm/yr", tone: "text-emerald-400" },
               { t: "19:24:05", msg: "GloFAS discharge ensemble fetched…", tail: "OK", tone: "text-emerald-400" },
               { t: "19:24:06", msg: "PostGIS commit · scenario_v3…", tail: "0.42s", tone: "text-emerald-400" },
             ].map((row) => (
@@ -561,7 +564,7 @@ export const MarketingSections = () => {
             ))}
           </ul>
           <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-white/30 mt-12 text-center">
-            AquaScan © 2026 · European Hydro-Intelligence Center
+            Aqua Scan <span className="text-cyan-400">Pro</span> © 2026 · European Hydro-Intelligence Center
           </p>
         </motion.div>
       </footer>

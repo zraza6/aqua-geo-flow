@@ -62,7 +62,7 @@ const Index = () => {
   const timersRef = useRef<number[]>([]);
 
   useEffect(() => {
-    document.title = "AquaScan — European Hydro-Intelligence Center";
+    document.title = "Aqua Scan Pro — European Hydro-Intelligence Center";
     return () => {
       timersRef.current.forEach((t) => window.clearTimeout(t));
     };
