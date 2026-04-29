@@ -175,7 +175,7 @@ export const MarketingSections = () => {
   return (
     <>
       {/* SECTION 0 — HERO / BRAND INTRO */}
-      <section id="hero" className="relative scroll-mt-24 overflow-hidden border-t border-white/5 bg-[#030712] px-6 py-28">
+      <section id="introducere" className="relative scroll-mt-24 overflow-hidden border-t border-white/5 bg-[#030712] px-6 py-28">
         <div
           className="pointer-events-none absolute inset-0 opacity-40"
           style={{
@@ -262,7 +262,7 @@ export const MarketingSections = () => {
       </section>
 
       {/* SECTION 0b — DATA & ALGORITHMS */}
-      <section className="border-t border-white/5 bg-[#030712] px-6 py-24">
+      <section id="date-utilizate" className="scroll-mt-24 border-t border-white/5 bg-[#030712] px-6 py-24">
         <motion.div {...fadeUp} className="mx-auto max-w-6xl">
           <div className="mb-12 text-center">
             <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-cyan-400/80">
@@ -308,7 +308,7 @@ export const MarketingSections = () => {
               </ul>
             </div>
 
-            <div className="rounded-3xl border border-white/10 bg-slate-950/75 p-8 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/30 hover:[box-shadow:0_0_30px_-5px_rgba(34,211,238,0.3)]">
+            <div id="algoritmi" className="scroll-mt-24 rounded-3xl border border-white/10 bg-slate-950/75 p-8 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/30 hover:[box-shadow:0_0_30px_-5px_rgba(34,211,238,0.3)]">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-cyan-400/30 bg-cyan-400/10">
                   <Workflow className="h-5 w-5 text-cyan-300" />
@@ -360,7 +360,7 @@ export const MarketingSections = () => {
       </section>
 
       {/* SECTION A — PRODUCT SYNERGY */}
-      <section className="bg-[#030712] py-24 px-6">
+      <section id="produs" className="scroll-mt-24 bg-[#030712] py-24 px-6">
         <motion.h2
           {...fadeUp}
           className="text-4xl font-semibold text-white/90 text-center mb-4 tracking-tight"
@@ -466,7 +466,7 @@ export const MarketingSections = () => {
       </section>
 
       {/* SECTION B — ROADMAP */}
-      <section className="bg-[#030712] py-24 px-6">
+      <section id="roadmap" className="scroll-mt-24 bg-[#030712] py-24 px-6">
         <motion.h2
           {...fadeUp}
           className="text-3xl text-white/90 text-center mb-16 font-semibold tracking-tight"
@@ -508,7 +508,8 @@ export const MarketingSections = () => {
       </section>
 
       {/* SECTION C — ENTERPRISE ECONOMICS */}
-      <section className="bg-[#030712] py-24 px-6 border-t border-white/5">
+      <section id="economics" className="scroll-mt-24 bg-[#030712] py-24 px-6 border-t border-white/5">
+        <span id="business-finante" className="block -mt-24 pt-24" aria-hidden="true" />
         <motion.h2
           {...fadeUp}
           className="text-center text-white font-semibold uppercase mb-16 text-3xl md:text-4xl tracking-[0.18em] [text-shadow:0_0_24px_rgba(34,211,238,0.18)]"
