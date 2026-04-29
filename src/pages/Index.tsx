@@ -130,8 +130,8 @@ const Index = () => {
   };
 
   return (
-    <main className="relative w-full bg-slate-950">
-      <div className="relative h-screen w-full overflow-hidden">
+    <main className="flex min-h-screen w-full flex-col bg-[#030712] text-slate-200">
+      <div className="relative h-[85vh] w-full shrink-0 overflow-hidden">
         {/* === LAYER 0: MAP === */}
         <div className="absolute inset-0 z-0">
           <AquaMap
