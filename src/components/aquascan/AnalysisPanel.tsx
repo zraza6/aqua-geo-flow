@@ -237,7 +237,7 @@ export function AnalysisPanel({
       </div>
 
       {/* === STICKY FOOTER === */}
-      <footer className="shrink-0 border-t border-white/10 bg-slate-900/95 px-5 py-4 backdrop-blur-xl">
+      <footer className="shrink-0 border-t border-white/10 bg-slate-950 px-5 py-4">
         <SimulatorButton
           status={simulationStatus}
           onSimulate={onSimulate}
