@@ -93,11 +93,11 @@ export function AnalysisPanel({
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: 24, opacity: 0 }}
       transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-      className="pointer-events-auto isolate mr-20 flex h-[88vh] max-h-[90vh] w-[480px] flex-col overflow-hidden rounded-3xl border border-white/10 bg-slate-950/75 backdrop-blur-xl shadow-[0_0_20px_-5px_rgba(34,211,238,0.15),0_8px_32px_rgba(0,0,0,0.5)] [border-radius:1.5rem] [clip-path:inset(0_round_1.5rem)] [contain:paint]"
+      className="pointer-events-auto isolate mr-20 flex h-[calc(100vh-140px)] w-[480px] flex-col overflow-hidden rounded-[32px] border border-white/10 bg-slate-950/75 backdrop-blur-xl shadow-[0_0_20px_-5px_rgba(34,211,238,0.15),0_8px_32px_rgba(0,0,0,0.5)] [clip-path:inset(0_round_32px)] [contain:paint]"
       {...stopMapPropagation}
     >
       {/* === STICKY HEADER === */}
-      <header className="relative shrink-0 rounded-t-3xl border-b border-white/10 bg-slate-950/80 px-6 pb-6 pt-5 backdrop-blur-xl">
+      <header className="relative shrink-0 rounded-t-[32px] border-b border-white/10 bg-slate-950/80 px-6 pb-6 pt-5 backdrop-blur-xl">
         <button
           onClick={onClose}
           disabled={running}
@@ -106,12 +106,15 @@ export function AnalysisPanel({
         >
           <X className="h-4 w-4" />
         </button>
-        <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-cyan-400 [text-shadow:0_0_10px_rgba(34,211,238,0.6)]">
-          Pre-Feasibility Site Report
+        <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-white/60">
+          Aqua Scan <span className="text-cyan-400 [text-shadow:0_0_10px_rgba(34,211,238,0.6)]">Pro</span>
         </p>
         <h2 className="mt-1.5 pr-8 text-[16px] font-semibold leading-tight text-white">
           {zoneName}
         </h2>
+        <p className="mt-1 font-mono text-[9px] uppercase tracking-[0.22em] text-cyan-400/80">
+          Pre-Feasibility Site Report
+        </p>
         <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[10px] text-white/60">
           <span className="rounded-md border border-white/10 bg-white/5 px-2 py-0.5">
             <span className="text-white/40">AOI</span>{" "}
@@ -237,7 +240,7 @@ export function AnalysisPanel({
       </div>
 
       {/* === STICKY FOOTER === */}
-      <footer className="relative z-10 shrink-0 overflow-hidden rounded-b-3xl border-t border-white/10 bg-slate-950/95 px-5 py-4 backdrop-blur-xl [border-bottom-left-radius:1.5rem] [border-bottom-right-radius:1.5rem]">
+      <footer className="relative z-10 shrink-0 overflow-hidden rounded-b-[32px] border-t border-white/10 bg-slate-950/95 px-5 py-4 backdrop-blur-xl">
         <div className="flex flex-col gap-2.5">
           <SimulatorButton
             status={simulationStatus}
