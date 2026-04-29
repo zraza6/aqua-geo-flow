@@ -143,6 +143,26 @@ function InteractiveTerrain() {
   );
 }
 
+/* ------------ Interactive Tech Chip with hover tooltip + glow ------------ */
+function TechChip({ name, tip }: { name: string; tip: string }) {
+  return (
+    <motion.span
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.97 }}
+      transition={{ type: "spring", stiffness: 350, damping: 22 }}
+      className="group relative inline-block cursor-pointer rounded-full border border-white/10 bg-slate-950/75 px-3.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-white/75 backdrop-blur-xl transition-colors hover:border-cyan-400/50 hover:text-cyan-300 hover:[box-shadow:0_0_22px_-4px_rgba(34,211,238,0.65)]"
+    >
+      {name}
+      <span
+        role="tooltip"
+        className="pointer-events-none absolute left-1/2 top-full z-20 mt-2 w-max max-w-[220px] -translate-x-1/2 translate-y-1 rounded-lg border border-white/10 bg-slate-950/95 px-3 py-1.5 text-[10.5px] font-light normal-case tracking-normal text-white/85 opacity-0 backdrop-blur-xl shadow-[0_8px_24px_rgba(0,0,0,0.5),0_0_18px_-4px_rgba(34,211,238,0.4)] transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100"
+      >
+        {tip}
+      </span>
+    </motion.span>
+  );
+}
+
 export const MarketingSections = () => {
   return (
     <>
