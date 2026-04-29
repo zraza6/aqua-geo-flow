@@ -16,36 +16,34 @@ const items: { id: CommandTab; icon: any; label: string }[] = [
 export function CommandHub({ active, onChange }: Props) {
   return (
     <nav
-      className={`${GLASS} pointer-events-auto flex flex-col items-center gap-2 p-3`}
+      className={`${GLASS} pointer-events-auto flex flex-col items-center gap-1.5 p-2`}
       {...stopMapPropagation}
     >
-      <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-400 to-cyan-600 shadow-[0_0_20px_rgba(34,211,238,0.55)]">
-        <Globe2 className="h-5 w-5 text-slate-950" strokeWidth={2.5} />
+      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-400 to-cyan-600 shadow-[0_0_18px_rgba(34,211,238,0.55)]">
+        <Globe2 className="h-4.5 w-4.5 text-slate-950" strokeWidth={2.5} />
       </div>
-      <div className="my-1 h-px w-8 bg-white/10" />
-      <div className="flex flex-col items-center gap-1.5">
+      <div className="my-0.5 h-px w-7 bg-white/10" />
+      <div className="flex flex-col items-center gap-1">
         {items.map((it) => {
           const Icon = it.icon;
           const isActive = active === it.id;
           return (
             <button
               key={it.id}
-              onClick={() =>
-                onChange(isActive && it.id !== "dashboard" ? "dashboard" : it.id)
-              }
+              onClick={() => onChange(it.id)}
               title={it.label}
               aria-label={it.label}
-              className={`group relative flex h-11 w-11 items-center justify-center rounded-2xl transition-all duration-200 ${
+              className={`group relative flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-200 ${
                 isActive
                   ? "bg-cyan-400/15 text-cyan-300 [box-shadow:inset_0_0_0_1px_rgba(34,211,238,0.5),0_0_18px_rgba(34,211,238,0.25)]"
                   : "text-white/65 hover:bg-white/10 hover:text-white"
               }`}
             >
               {isActive && (
-                <span className="absolute -left-3 h-6 w-1 rounded-r-full bg-cyan-400 [box-shadow:0_0_10px_rgba(34,211,238,0.8)]" />
+                <span className="absolute -left-2.5 h-5 w-1 rounded-r-full bg-cyan-400 [box-shadow:0_0_10px_rgba(34,211,238,0.8)]" />
               )}
-              <Icon className="h-5 w-5" strokeWidth={1.75} />
-              <span className="pointer-events-none absolute left-full ml-3 whitespace-nowrap rounded-xl border border-white/10 bg-slate-900/80 px-2.5 py-1 text-[10px] font-medium text-white/90 opacity-0 backdrop-blur-xl transition-opacity group-hover:opacity-100">
+              <Icon className="h-4.5 w-4.5" strokeWidth={1.75} />
+              <span className="pointer-events-none absolute left-full ml-3 whitespace-nowrap rounded-lg border border-white/10 bg-slate-900/80 px-2 py-1 text-[10px] font-medium text-white/90 opacity-0 backdrop-blur-md transition-opacity group-hover:opacity-100">
                 {it.label}
               </span>
             </button>
