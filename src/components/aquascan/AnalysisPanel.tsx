@@ -97,7 +97,7 @@ export function AnalysisPanel({
       {...stopMapPropagation}
     >
       {/* === STICKY HEADER === */}
-      <header className="relative shrink-0 border-b border-white/10 bg-slate-950/70 px-6 py-5 backdrop-blur-xl">
+      <header className="relative shrink-0 border-b border-white/10 bg-slate-950/80 px-6 pb-6 pt-5 backdrop-blur-xl">
         <button
           onClick={onClose}
           disabled={running}
