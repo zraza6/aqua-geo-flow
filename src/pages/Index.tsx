@@ -114,6 +114,26 @@ const Index = () => {
     setHasInteracted(false);
   };
 
+  const handleResetDemo = () => {
+    mapRef.current?.reset();
+    setSelectedBasin(null);
+    setSimulationStatus("idle");
+    setHasInteracted(false);
+    setAnalyzing(false);
+    timersRef.current.forEach((t) => window.clearTimeout(t));
+    timersRef.current = [];
+    window.dispatchEvent(new CustomEvent("aquascan:reset-demo"));
+    toast.success("Demo reset", {
+      description: "Map cleared · AOI removed · Node A3 restored.",
+      icon: <RefreshCw className="h-4 w-4 text-cyan-400" />,
+      duration: 3000,
+    });
+  };
+
+  const handleAreaChange = (km2: number) => {
+    setSelectedBasin((b) => (b ? { ...b, areaKm2: km2 } : b));
+  };
+
   const handleClosePanel = () => {
     if (simulationStatus !== "idle" && simulationStatus !== "complete") return;
     setSelectedBasin(null);
