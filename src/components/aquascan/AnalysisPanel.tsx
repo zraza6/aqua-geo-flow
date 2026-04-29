@@ -10,9 +10,12 @@ import {
   Scale,
   TrendingUp,
   AlertTriangle,
+  FileDown,
+  CheckCircle2,
 } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
 import { stopMapPropagation } from "./stopMap";
 
 export type SimulationStatus =
@@ -235,13 +238,52 @@ export function AnalysisPanel({
 
       {/* === STICKY FOOTER === */}
       <footer className="relative z-10 shrink-0 overflow-hidden rounded-b-3xl border-t border-white/10 bg-slate-950/95 px-5 py-4 backdrop-blur-xl [border-bottom-left-radius:1.5rem] [border-bottom-right-radius:1.5rem]">
-        <SimulatorButton
-          status={simulationStatus}
-          onSimulate={onSimulate}
-          onReset={onReset}
-        />
+        <div className="flex flex-col gap-2.5">
+          <SimulatorButton
+            status={simulationStatus}
+            onSimulate={onSimulate}
+            onReset={onReset}
+          />
+          <ExportPdfButton zoneName={zoneName} />
+        </div>
       </footer>
     </motion.aside>
+  );
+}
+
+function ExportPdfButton({ zoneName }: { zoneName: string }) {
+  const [loading, setLoading] = useState(false);
+  const handleExport = () => {
+    if (loading) return;
+    setLoading(true);
+    const id = toast.loading("Generating PDF…", {
+      description: `Compiling pre-feasibility report for ${zoneName}`,
+    });
+    window.setTimeout(() => {
+      setLoading(false);
+      toast.success("Report ready", {
+        id,
+        description: `${zoneName.replace(/\s+/g, "_")}_PreFeasibility.pdf · 2.4 MB`,
+        icon: <CheckCircle2 className="h-4 w-4 text-cyan-400" />,
+        duration: 4500,
+      });
+    }, 1800);
+  };
+  return (
+    <button
+      onClick={handleExport}
+      disabled={loading}
+      className="group flex w-full items-center justify-center gap-2 rounded-xl border border-cyan-400/40 bg-transparent px-4 py-2.5 text-cyan-200 transition-all hover:border-cyan-300 hover:bg-cyan-400/10 hover:text-cyan-100 disabled:opacity-60 [box-shadow:inset_0_1px_0_rgba(255,255,255,0.04)]"
+    >
+      {loading ? (
+        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+      ) : (
+        <FileDown className="h-3.5 w-3.5" />
+      )}
+      <span className="font-mono text-[10px] uppercase tracking-[0.22em]">
+        {loading ? "Generating PDF…" : "Export Report PDF"}
+      </span>
+    </button>
   );
 }
 

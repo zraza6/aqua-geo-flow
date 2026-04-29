@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, RefreshCw } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import L from "leaflet";
 import {
@@ -114,6 +114,26 @@ const Index = () => {
     setHasInteracted(false);
   };
 
+  const handleResetDemo = () => {
+    mapRef.current?.reset();
+    setSelectedBasin(null);
+    setSimulationStatus("idle");
+    setHasInteracted(false);
+    setAnalyzing(false);
+    timersRef.current.forEach((t) => window.clearTimeout(t));
+    timersRef.current = [];
+    window.dispatchEvent(new CustomEvent("aquascan:reset-demo"));
+    toast.success("Demo reset", {
+      description: "Map cleared · AOI removed · Node A3 restored.",
+      icon: <RefreshCw className="h-4 w-4 text-cyan-400" />,
+      duration: 3000,
+    });
+  };
+
+  const handleAreaChange = (km2: number) => {
+    setSelectedBasin((b) => (b ? { ...b, areaKm2: km2 } : b));
+  };
+
   const handleClosePanel = () => {
     if (simulationStatus !== "idle" && simulationStatus !== "complete") return;
     setSelectedBasin(null);
@@ -137,6 +157,7 @@ const Index = () => {
           <AquaMap
             ref={mapRef}
             onPolygonComplete={handlePolygonComplete}
+            onAreaChange={handleAreaChange}
             onOpenLayers={() => {
               setActiveSidebarTab("layers");
               setShowContext(true);
@@ -242,6 +263,20 @@ const Index = () => {
               </motion.div>
             )}
         </AnimatePresence>
+
+        {/* RESET DEMO — bottom-left FAB */}
+        <button
+          onClick={handleResetDemo}
+          {...stopMapPropagation}
+          title="Reset Demo"
+          aria-label="Reset Demo"
+          className="group pointer-events-auto absolute bottom-6 left-6 z-[1100] flex items-center gap-2 rounded-2xl border border-white/10 bg-slate-950/75 px-3.5 py-2 text-white/80 backdrop-blur-xl transition-all hover:border-cyan-400/50 hover:bg-cyan-400/10 hover:text-cyan-200 [box-shadow:0_8px_32px_rgba(0,0,0,0.4)]"
+        >
+          <RefreshCw className="h-3.5 w-3.5 transition-transform group-hover:-rotate-180 duration-500" />
+          <span className="font-mono text-[10px] uppercase tracking-[0.22em]">
+            Reset Demo
+          </span>
+        </button>
 
         {analyzing && <LoadingOverlay />}
       </div>

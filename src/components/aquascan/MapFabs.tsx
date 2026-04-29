@@ -1,18 +1,20 @@
-import { Layers, ZoomIn, ZoomOut, Locate, Pencil } from "lucide-react";
+import { Layers, ZoomIn, ZoomOut, Locate, Pencil, Move3d } from "lucide-react";
 import { useMap } from "react-leaflet";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import { GLASS, stopMapPropagation } from "./stopMap";
 
 interface FabsProps {
   onOpenLayers: () => void;
   onStartDraw: () => void;
+  onToggleEdit?: () => boolean;
 }
 
 /** Inner controls — must be inside <MapContainer> so useMap() works. */
-export function MapFabsInner({ onOpenLayers, onStartDraw }: FabsProps) {
+export function MapFabsInner({ onOpenLayers, onStartDraw, onToggleEdit }: FabsProps) {
   const map = useMap();
   const wrapRef = useRef<HTMLDivElement | null>(null);
+  const [editing, setEditing] = useState(false);
 
   // Bullet-proof Leaflet event isolation — kills click-through to the map underneath.
   useEffect(() => {
@@ -33,6 +35,18 @@ export function MapFabsInner({ onOpenLayers, onStartDraw }: FabsProps) {
       <Fab label="Draw AOI" onClick={onStartDraw}>
         <Pencil className="h-5 w-5" />
       </Fab>
+      {onToggleEdit && (
+        <Fab
+          label={editing ? "Exit Edit Mode" : "Edit Polygon"}
+          active={editing}
+          onClick={() => {
+            const next = onToggleEdit();
+            setEditing(next);
+          }}
+        >
+          <Move3d className="h-5 w-5" />
+        </Fab>
+      )}
       <div className={`${GLASS} flex flex-col overflow-hidden p-1`}>
         <button
           aria-label="Zoom in"
@@ -65,11 +79,13 @@ function Fab({
   onClick,
   label,
   accent,
+  active,
 }: {
   children: React.ReactNode;
   onClick: () => void;
   label: string;
   accent?: boolean;
+  active?: boolean;
 }) {
   return (
     <button
@@ -77,7 +93,9 @@ function Fab({
       title={label}
       aria-label={label}
       className={`${GLASS} group relative flex h-11 w-11 items-center justify-center transition-all hover:scale-105 ${
-        accent
+        active
+          ? "text-amber-300 [box-shadow:0_0_18px_rgba(251,191,36,0.45),0_8px_32px_rgba(0,0,0,0.3)] !border-amber-400/60 !bg-amber-400/10"
+          : accent
           ? "text-cyan-400 [box-shadow:0_0_18px_rgba(34,211,238,0.35),0_8px_32px_rgba(0,0,0,0.3)] hover:bg-cyan-400/10"
           : "text-white/85 hover:bg-white/10 hover:text-cyan-300"
       }`}
