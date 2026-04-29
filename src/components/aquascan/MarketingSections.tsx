@@ -247,7 +247,7 @@ export const MarketingSections = () => {
       <section className="bg-[#030712] py-24 px-6 border-t border-white/5">
         <motion.h2
           {...fadeUp}
-          className="text-center text-white font-semibold uppercase mb-16 text-5xl md:text-6xl tracking-[0.08em] [text-shadow:0_0_30px_rgba(34,211,238,0.15)]"
+          className="text-center text-white font-semibold uppercase mb-16 text-3xl md:text-4xl tracking-[0.18em] [text-shadow:0_0_24px_rgba(34,211,238,0.18)]"
         >
           SaaS Financial Model
         </motion.h2>
@@ -259,7 +259,7 @@ export const MarketingSections = () => {
               { num: "3,000 EUR", label: "Estimated B2B License / month / agency" },
             ].map((s) => (
               <div key={s.num} className="text-center">
-                <div className="font-mono text-6xl md:text-7xl text-white font-bold tracking-tight tabular-nums [text-shadow:0_0_24px_rgba(34,211,238,0.35)]">
+                <div className="font-mono text-4xl md:text-5xl text-white font-bold tracking-tight tabular-nums [text-shadow:0_0_24px_rgba(34,211,238,0.35)]">
                   {s.num}
                 </div>
                 <div className="text-white/60 text-sm mt-4 max-w-[200px] mx-auto leading-snug">
