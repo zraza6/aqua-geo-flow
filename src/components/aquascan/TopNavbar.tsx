@@ -220,7 +220,7 @@ export function TopNavbar() {
                   icon={FileText}
                   tone="cyan"
                   title="Compliance"
-                  body="Legea Apelor nr. 107/1996 pre-feasibility report successfully generated."
+                  body="Water Law 107/1996 pre-feasibility report successfully generated."
                   time="1 h ago"
                 />
               </div>
