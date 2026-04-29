@@ -18,6 +18,7 @@ import { MapLegend } from "@/components/aquascan/MapLegend";
 import { CommandHub, type CommandTab } from "@/components/aquascan/CommandHub";
 import { ContextPanel } from "@/components/aquascan/ContextPanel";
 import { stopMapPropagation } from "@/components/aquascan/stopMap";
+import { MarketingSections } from "@/components/aquascan/MarketingSections";
 
 interface SelectedBasin {
   id: string;
@@ -101,7 +102,8 @@ const Index = () => {
   };
 
   return (
-    <main className="relative h-screen w-screen overflow-hidden bg-slate-950">
+    <main className="relative w-full bg-slate-950">
+      <div className="relative h-screen w-full overflow-hidden">
       {/* === LAYER 0: MAP === */}
       <div className="absolute inset-0 z-0">
         <AquaMap
