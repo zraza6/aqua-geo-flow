@@ -323,7 +323,7 @@ export function AnalysisPanel({
       </div>
 
       {/* Decision footer — Simulate is a SECONDARY action below Location Info */}
-      <div className="shrink-0 border-t border-white/10 bg-slate-900/95 px-8 py-5 backdrop-blur-md">
+      <div className="shrink-0 border-t border-white/10 bg-slate-900/95 px-10 py-7 backdrop-blur-md">
         <p className="mb-3 font-mono text-[8.5px] uppercase tracking-[0.22em] text-white/40">
           Secondary action · advanced simulation
         </p>
