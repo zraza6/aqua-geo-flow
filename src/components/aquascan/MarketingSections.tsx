@@ -488,6 +488,58 @@ export const MarketingSections = () => {
             ))}
           </div>
         </motion.div>
+
+        {/* Stack Rationale — Backend / Frontend technical justification */}
+        <motion.div
+          {...fadeUp}
+          transition={{ ...fadeUp.transition, delay: 0.22 }}
+          className="max-w-6xl mx-auto mt-6 grid grid-cols-1 md:grid-cols-2 gap-6"
+        >
+          <div className="rounded-3xl border border-white/10 bg-slate-950/75 p-8 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/30 hover:[box-shadow:0_0_30px_-5px_rgba(34,211,238,0.3)]">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-cyan-400/30 bg-cyan-400/10">
+                <Cpu className="h-5 w-5 text-cyan-300" />
+              </div>
+              <h3 className="text-lg font-semibold text-white">
+                Backend · <span className="text-cyan-400">Python</span>
+              </h3>
+            </div>
+            <p className="mt-5 text-sm leading-relaxed text-white/70">
+              Am ales <span className="text-white font-medium">Python</span> datorită
+              maturității ecosistemului geospațial (<span className="text-cyan-300 font-mono">GDAL</span>,{" "}
+              <span className="text-cyan-300 font-mono">Fiona</span>,{" "}
+              <span className="text-cyan-300 font-mono">PyProj</span>).
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-white/55">
+              <span className="text-amber-300 font-medium">Îmbunătățire necesară:</span>{" "}
+              Trecerea de la procesare sincronă la una asincronă folosind{" "}
+              <span className="text-cyan-300 font-mono">FastAPI</span> și task-uri{" "}
+              <span className="text-cyan-300 font-mono">Celery</span> pentru a gestiona volume mari de date satelitare.
+            </p>
+          </div>
+
+          <div className="rounded-3xl border border-white/10 bg-slate-950/75 p-8 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/30 hover:[box-shadow:0_0_30px_-5px_rgba(34,211,238,0.3)]">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-cyan-400/30 bg-cyan-400/10">
+                <Code2 className="h-5 w-5 text-cyan-300" />
+              </div>
+              <h3 className="text-lg font-semibold text-white">
+                Frontend · <span className="text-cyan-400">React / Next.js</span>
+              </h3>
+            </div>
+            <p className="mt-5 text-sm leading-relaxed text-white/70">
+              <span className="text-white font-medium">React / Next.js</span> pentru
+              manipularea fluidă a obiectelor{" "}
+              <span className="text-cyan-300 font-mono">GeoJSON</span> pe hartă și
+              interactivitate în timp real cu{" "}
+              <span className="text-amber-300 font-medium">Node A3</span>.
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-white/55">
+              Layer-ul UI rămâne deterministic și sincronizat cu backend-ul HeavyWater prin
+              fluxuri reactive — fiecare drag re-evaluează permeabilitatea și riscul.
+            </p>
+          </div>
+        </motion.div>
       </section>
 
       {/* SECTION 4 — SCALING & FUTURE CAPABILITIES */}
