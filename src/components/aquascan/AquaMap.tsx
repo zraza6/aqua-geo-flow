@@ -129,6 +129,71 @@ function MapTuning() {
   const map = useMap();
   useEffect(() => {
     map.attributionControl.setPrefix("");
+
+    // === Click-to-focus scroll wheel zoom ===
+    // Disabled by default; enabled for 4s after the user clicks the map.
+    map.scrollWheelZoom.disable();
+    const container = map.getContainer();
+    let timeout: number | null = null;
+    const enableTemporarily = () => {
+      map.scrollWheelZoom.enable();
+      container.classList.add("ring-2", "ring-cyan-400/30");
+      if (timeout) window.clearTimeout(timeout);
+      timeout = window.setTimeout(() => {
+        map.scrollWheelZoom.disable();
+        container.classList.remove("ring-2", "ring-cyan-400/30");
+      }, 4000);
+    };
+    const disableNow = () => {
+      if (timeout) window.clearTimeout(timeout);
+      map.scrollWheelZoom.disable();
+      container.classList.remove("ring-2", "ring-cyan-400/30");
+    };
+    container.addEventListener("mousedown", enableTemporarily);
+    container.addEventListener("mouseleave", disableNow);
+
+    // === Right-click pan + suppress context menu ===
+    // Leaflet default drag is left-click. We add a right-click drag-to-pan and
+    // suppress the browser context menu so it never interferes with drawing.
+    const onContextMenu = (e: Event) => e.preventDefault();
+    container.addEventListener("contextmenu", onContextMenu);
+
+    let panning = false;
+    let lastX = 0;
+    let lastY = 0;
+    const onMouseDown = (e: MouseEvent) => {
+      if (e.button !== 2) return; // right click only
+      panning = true;
+      lastX = e.clientX;
+      lastY = e.clientY;
+      container.style.cursor = "grabbing";
+    };
+    const onMouseMove = (e: MouseEvent) => {
+      if (!panning) return;
+      const dx = e.clientX - lastX;
+      const dy = e.clientY - lastY;
+      lastX = e.clientX;
+      lastY = e.clientY;
+      map.panBy([-dx, -dy], { animate: false });
+    };
+    const onMouseUp = (e: MouseEvent) => {
+      if (e.button !== 2) return;
+      panning = false;
+      container.style.cursor = "";
+    };
+    container.addEventListener("mousedown", onMouseDown);
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+
+    return () => {
+      if (timeout) window.clearTimeout(timeout);
+      container.removeEventListener("mousedown", enableTemporarily);
+      container.removeEventListener("mouseleave", disableNow);
+      container.removeEventListener("contextmenu", onContextMenu);
+      container.removeEventListener("mousedown", onMouseDown);
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+    };
   }, [map]);
   return null;
 }
