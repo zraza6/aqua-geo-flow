@@ -458,6 +458,7 @@ export const AquaMap = memo(AquaMapInner, (prev, next) => {
   return (
     prev.layers.dem === next.layers.dem &&
     prev.layers.waterEvolution === next.layers.waterEvolution &&
-    prev.layers.sarUrban === next.layers.sarUrban
+    prev.layers.sarUrban === next.layers.sarUrban &&
+    prev.panelOpen === next.panelOpen
   );
 });
