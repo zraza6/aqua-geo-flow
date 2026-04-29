@@ -512,3 +512,39 @@ function SimulatorButton({
 function Dot() {
   return <span className="h-1 w-1 rounded-full bg-white/20" />;
 }
+
+function LocRow({
+  icon: Icon,
+  label,
+  meta,
+  value,
+}: {
+  icon: any;
+  label: string;
+  meta: string;
+  value: string;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-4">
+      <div className="flex min-w-0 items-center gap-3">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-cyan-400/20 bg-cyan-400/[0.08]">
+          <Icon className="h-4 w-4 text-cyan-300" />
+        </div>
+        <div className="flex min-w-0 flex-col">
+          <span className="text-[11px] font-light leading-tight text-white/70">
+            {label}
+          </span>
+          <span className="font-mono text-[8.5px] uppercase tracking-wider text-white/40">
+            {meta}
+          </span>
+        </div>
+      </div>
+      <span
+        className="font-mono text-[13px] font-bold text-white"
+        style={{ textShadow: "0 0 10px rgba(34,211,238,0.35)" }}
+      >
+        {value}
+      </span>
+    </div>
+  );
+}
