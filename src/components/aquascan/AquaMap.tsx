@@ -526,7 +526,6 @@ const AquaMapInner = forwardRef<AquaMapHandle, Props>(function AquaMapInner(
       <MapFabsInner
         onOpenLayers={onOpenLayers}
         onStartDraw={() => startDrawRef.current?.()}
-        shifted={panelOpen}
       />
     </MapContainer>
   );
