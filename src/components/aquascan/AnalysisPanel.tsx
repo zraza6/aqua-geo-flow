@@ -78,6 +78,32 @@ export function AnalysisPanel({
     const seed = Math.floor((lat + 90) * 1e4) ^ Math.floor((lng + 180) * 1e4);
     const r = mulberry32(seed || 1);
 
+    // Coarse elevation model: latitude band + jitter so it varies globally
+    const baseElev = Math.max(
+      0,
+      Math.round(rand(r, 20, 2400) * (1 - Math.abs(Math.abs(lat) - 45) / 90)),
+    );
+    const elevation = baseElev;
+    const terrainType =
+      elevation < 200
+        ? "Plains / Lowland"
+        : elevation < 800
+          ? "Hills / Plateau"
+          : elevation < 1800
+            ? "Mountainous Terrain"
+            : "Alpine / High Mountain";
+    const landCovers = [
+      "Broadleaf Forest",
+      "Coniferous Forest",
+      "Grassland",
+      "Cropland",
+      "Sparse Vegetation",
+      "Wetland",
+      "Bare Soil",
+      "Urban Fabric",
+    ];
+    const landCover = landCovers[Math.floor(r() * landCovers.length)];
+
     const elevDrop = rand(r, 15, 120);
     const discharge = rand(r, 0.5, 45.2);
     const continuity = r() > 0.35 ? "Stable" : "Drought-prone";
@@ -87,6 +113,9 @@ export function AnalysisPanel({
     const roiSavings = Math.round(rand(r, 18000, 45000) / 100) * 100;
 
     return {
+      elevation: elevation.toLocaleString("en-US"),
+      terrainType,
+      landCover,
       elevDrop: elevDrop.toFixed(1),
       discharge: discharge.toFixed(2),
       continuity,
