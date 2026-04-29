@@ -132,8 +132,8 @@ function MapTuning() {
   return null;
 }
 
-/** Pushes the current map center/zoom into the viewportBus on every move/zoom end. */
-function ViewportTracker() {
+/** Pushes the current map center/zoom into the viewportBus + delegates global click. */
+function ViewportTracker({ onMapClick }: { onMapClick: (e: L.LeafletMouseEvent) => void }) {
   const map = useMapEvents({
     moveend: () => {
       const c = map.getCenter();
@@ -143,6 +143,7 @@ function ViewportTracker() {
       const c = map.getCenter();
       viewportBus.set({ lat: c.lat, lng: c.lng, zoom: map.getZoom() });
     },
+    click: (e) => onMapClick(e),
   });
   useEffect(() => {
     const c = map.getCenter();
