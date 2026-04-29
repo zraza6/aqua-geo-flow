@@ -34,18 +34,18 @@ function InteractiveTerrain() {
     180 - 92 * Math.sin((xv / W) * Math.PI * 1.4) - 28 * Math.sin((xv / W) * Math.PI * 3.2);
 
   const dotY = useTransform(x, (xv) => curveY(xv));
-  const ksat = useTransform(x, (xv) => (8 + (xv / W) * 30).toFixed(1));
-  const elev = useTransform(x, (xv) => (640 - curveY(xv) * 1.6).toFixed(0));
+  const ksat = useTransform(x, (xv) => (15.4 + (xv / W) * (38.0 - 15.4)).toFixed(1));
+  const elev = useTransform(x, (xv) => Math.round(450 + ((H - curveY(xv)) / H) * (1200 - 450)).toString());
   const risk = useTransform(x, (xv) => {
-    const v = 8 + (xv / W) * 30;
-    if (v > 28) return "Critical Seepage";
-    if (v > 18) return "High Seepage";
+    const v = 15.4 + (xv / W) * (38.0 - 15.4);
+    if (v > 30) return "Critical Seepage";
+    if (v > 20) return "High Seepage";
     return "Stable";
   });
   const rec = useTransform(x, (xv) => {
-    const v = 8 + (xv / W) * 30;
-    if (v > 28) return "HDPE + Bentonite";
-    if (v > 18) return "HDPE Liner";
+    const v = 15.4 + (xv / W) * (38.0 - 15.4);
+    if (v > 30) return "HDPE + Bentonite";
+    if (v > 20) return "HDPE Liner";
     return "Compacted Clay";
   });
 
