@@ -18,4 +18,4 @@ export const stopMapPropagation = {
 
 /** Tailwind classes for the canonical Liquid Glass panel. */
 export const GLASS =
-  "bg-slate-900/40 backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)] rounded-3xl";
+  "bg-slate-900/70 backdrop-blur-md border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)] rounded-2xl";

@@ -338,9 +338,10 @@ const AquaMapInner = forwardRef<AquaMapHandle, Props>(function AquaMapInner(
 
   return (
     <MapContainer
-      center={[46.7, 23.6]}
-      zoom={9}
-      minZoom={5}
+      center={[48.5, 11.0]}
+      zoom={5}
+      minZoom={2}
+      maxZoom={17}
       zoomControl={false}
       className="h-full w-full z-0"
       worldCopyJump

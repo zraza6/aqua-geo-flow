@@ -21,20 +21,20 @@ interface Props {
 export function ContextPanel({ tab, layers, onToggleLayer }: Props) {
   return (
     <aside
-      className={`${GLASS} pointer-events-auto flex h-full w-72 flex-col overflow-hidden md:w-80`}
+      className={`${GLASS} pointer-events-auto flex h-full w-64 flex-col overflow-hidden md:w-72`}
       {...stopMapPropagation}
     >
-      <header className="flex flex-col gap-1 border-b border-white/10 px-6 py-5">
-        <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-cyan-400 [text-shadow:0_0_10px_rgba(34,211,238,0.6)]">
+      <header className="flex flex-col gap-0.5 border-b border-white/10 px-5 py-4">
+        <p className="font-mono text-[9px] uppercase tracking-[0.25em] text-cyan-400 [text-shadow:0_0_10px_rgba(34,211,238,0.6)]">
           {labels[tab].kicker}
         </p>
-        <h2 className="text-[15px] font-semibold leading-tight text-white">
+        <h2 className="text-[14px] font-semibold leading-tight text-white">
           {labels[tab].title}
         </h2>
       </header>
       <div
         key={tab}
-        className="no-scrollbar flex-1 animate-[fade-in_0.3s_ease-out] overflow-y-auto p-5"
+        className="no-scrollbar flex-1 animate-[fade-in_0.3s_ease-out] overflow-y-auto p-4"
       >
         {tab === "dashboard" && <Dashboard />}
         {tab === "layers" && (

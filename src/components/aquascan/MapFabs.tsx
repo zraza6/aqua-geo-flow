@@ -40,7 +40,7 @@ export function MapFabsInner({ onOpenLayers, onStartDraw }: FabsProps) {
       </div>
       <Fab
         label="Recenter"
-        onClick={() => map.flyTo([37.55, -4.2], 7, { duration: 1.2 })}
+        onClick={() => map.flyTo([48.5, 11.0], 5, { duration: 1.2 })}
       >
         <Locate className="h-5 w-5" />
       </Fab>
