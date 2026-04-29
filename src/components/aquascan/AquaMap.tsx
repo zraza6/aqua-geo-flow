@@ -376,7 +376,11 @@ const AquaMapInner = forwardRef<AquaMapHandle, Props>(function AquaMapInner(
         [lat + dLat, lng - dLng],
       ];
       const poly = L.polygon(ring, DRAWN_STYLE);
-      if (fgRef.current) fgRef.current.addLayer(poly);
+      const marker = L.marker([lat, lng]);
+      if (fgRef.current) {
+        fgRef.current.addLayer(poly);
+        fgRef.current.addLayer(marker);
+      }
       drawnLayersRef.current.push(poly);
       activeLayerRef.current = poly;
       const area = polygonAreaKm2(poly.getLatLngs()[0] as L.LatLng[]);
