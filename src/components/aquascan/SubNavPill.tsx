@@ -1,6 +1,6 @@
 const ITEMS: { id: string; label: string }[] = [
   { id: "introducere", label: "Introducere" },
-  { id: "date-algoritmi", label: "Date și Algoritmi" },
+  { id: "date-algoritmi", label: "Date & Algoritmi" },
   { id: "arhitectura", label: "Arhitectura Produsului" },
   { id: "scaling", label: "Scaling & Future" },
   { id: "business", label: "Business" },
