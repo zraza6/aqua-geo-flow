@@ -222,30 +222,30 @@ export const MarketingSections = () => {
             {
               icon: Activity,
               title: "Predictive Maintenance (InSAR)",
-              text: "Extracting 5-year EGMS time-series. If subsidence rate accelerates > 2 mm/yr, we trigger a structural failure alert 6 months in advance.",
+              text: "Extracting 5-year <strong class='text-white/95 font-semibold'>EGMS time-series</strong>. If subsidence rate accelerates &gt; 2 mm/yr, we trigger a <strong class='text-white/95 font-semibold'>structural failure alert</strong> 6 months in advance.",
             },
             {
               icon: Droplets,
               title: "Climate Resilience (C3S)",
-              text: "If Sentinel-1 detects soil moisture < 15% for 3 consecutive summers, the system automatically runs a feasibility study for preventive irrigation.",
+              text: "If Sentinel-1 detects <strong class='text-white/95 font-semibold'>soil moisture &lt; 15%</strong> for 3 consecutive summers, the system automatically runs a feasibility study for <strong class='text-white/95 font-semibold'>preventive irrigation</strong>.",
             },
             {
               icon: FileText,
               title: "B2G Automation",
-              text: "Mapping output from river_metrics.py directly onto official ANAR annexes (Water Law 107/1996) for Water Management Approvals.",
+              text: "Mapping output from <code class='font-mono text-cyan-300/90'>river_metrics.py</code> directly onto official ANAR annexes (<strong class='text-white/95 font-semibold'>Water Law 107/1996</strong>) for <strong class='text-white/95 font-semibold'>Water Management Approvals</strong>.",
             },
           ].map(({ icon: Icon, title, text }, i) => (
             <motion.div
               key={title}
               {...fadeUp}
               transition={{ ...fadeUp.transition, delay: i * 0.08 }}
-              className="liquid-glass rounded-3xl p-8"
+              className="liquid-glass rounded-3xl p-8 border border-white/5 transition-all duration-300 hover:-translate-y-1 hover:border-cyan-500/30 hover:shadow-[0_0_30px_-5px_rgba(34,211,238,0.25)]"
             >
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-cyan-400/10 border border-cyan-400/20">
                 <Icon className="h-5 w-5 text-cyan-300" />
               </div>
               <h3 className="text-white/90 text-lg font-medium mt-6">{title}</h3>
-              <p className="text-white/70 text-sm mt-4 leading-relaxed">{text}</p>
+              <p className="text-white/70 text-sm mt-4 leading-relaxed" dangerouslySetInnerHTML={{ __html: text }} />
             </motion.div>
           ))}
         </div>
@@ -259,7 +259,7 @@ export const MarketingSections = () => {
         >
           SaaS Financial Model
         </motion.h2>
-        <motion.div {...fadeUp} className="liquid-glass rounded-3xl p-12 max-w-5xl mx-auto">
+        <motion.div {...fadeUp} className="liquid-glass rounded-3xl p-12 max-w-5xl mx-auto border border-white/5 transition-all duration-300 hover:-translate-y-1 hover:border-cyan-500/30 hover:shadow-[0_0_30px_-5px_rgba(34,211,238,0.25)]">
           <div className="flex flex-col md:flex-row items-center justify-around gap-10 md:gap-6">
             {[
               { num: "15k EUR", label: "Annual AWS Cloud Cost (PostGIS/EC2)" },
@@ -295,18 +295,22 @@ export const MarketingSections = () => {
           </div>
           <ul className="flex flex-col gap-3 border-l border-white/10 pl-6">
             {[
-              "Copernicus Land Monitoring Service (CLMS)",
-              "Copernicus Data Space Ecosystem (CDSE)",
-              "ISRIC SoilGrids v2.0",
-              "CEMS GloFAS / EFAS",
-              "Legislative Portal: Romanian Water Law No. 107/1996",
-              "SEAP (Electronic System of Public Procurement)",
+              { label: "Copernicus Land Monitoring Service (CLMS)", href: "https://land.copernicus.eu/" },
+              { label: "Copernicus Data Space Ecosystem (CDSE)", href: "https://dataspace.copernicus.eu/" },
+              { label: "ISRIC SoilGrids v2.0", href: "https://soilgrids.org/" },
+              { label: "CEMS GloFAS / EFAS", href: "https://global-flood.emergency.copernicus.eu/" },
+              { label: "Legislative Portal: Romanian Water Law No. 107/1996", href: "https://legislatie.just.ro/Public/DetaliiDocument/8709" },
+              { label: "SEAP (Electronic System of Public Procurement)", href: "https://e-licitatie.ro/" },
             ].map((item) => (
-              <li
-                key={item}
-                className="text-white/55 text-sm leading-relaxed hover:text-white/85 transition-colors"
-              >
-                {item}
+              <li key={item.label} className="text-sm leading-relaxed">
+                <a
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-white/55 transition-colors hover:text-cyan-400 hover:underline"
+                >
+                  {item.label}
+                </a>
               </li>
             ))}
           </ul>
