@@ -13,7 +13,7 @@ import {
   Cpu,
 } from "lucide-react";
 import { motion, useMotionValue, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 const fadeUp = {
   initial: { opacity: 0, y: 30 },
