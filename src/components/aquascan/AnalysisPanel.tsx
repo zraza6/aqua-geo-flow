@@ -135,11 +135,11 @@ export function AnalysisPanel({
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: 24, opacity: 0 }}
       transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-      className="pointer-events-auto flex max-h-[90vh] min-h-[640px] w-[460px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-900/70 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-md"
+      className="pointer-events-auto mr-16 flex max-h-[80vh] w-[440px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-900/70 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-md"
       {...stopMapPropagation}
     >
       {/* Header */}
-      <div className="relative flex flex-col gap-2 border-b border-white/10 px-10 py-7">
+      <div className="relative flex shrink-0 flex-col gap-2 border-b border-white/10 px-8 py-5">
         <button
           onClick={onClose}
           disabled={running}
@@ -165,7 +165,7 @@ export function AnalysisPanel({
         </div>
       </div>
 
-      <div className="no-scrollbar min-h-0 flex-1 overflow-y-auto px-10 py-8">
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-8 py-6" style={{ scrollbarWidth: "thin" }}>
         {/* === MODE 1 — LOCATION INFO (always visible header card) === */}
         <div className="mb-6 rounded-2xl border border-cyan-400/20 bg-cyan-400/[0.04] p-5">
           <div className="mb-4 flex items-center gap-2">
@@ -323,7 +323,7 @@ export function AnalysisPanel({
       </div>
 
       {/* Decision footer — Simulate is a SECONDARY action below Location Info */}
-      <div className="shrink-0 border-t border-white/10 bg-slate-900/95 px-10 py-7 backdrop-blur-md">
+      <div className="shrink-0 border-t border-white/10 bg-slate-900/95 px-8 py-5 backdrop-blur-md">
         <p className="mb-3 font-mono text-[8.5px] uppercase tracking-[0.22em] text-white/40">
           Secondary action · advanced simulation
         </p>
