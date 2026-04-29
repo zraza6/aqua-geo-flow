@@ -25,7 +25,7 @@ export function MapFabsInner({ onOpenLayers, onStartDraw, shifted }: FabsProps) 
   return (
     <div
       ref={wrapRef}
-      className="absolute right-6 top-1/2 z-[1000] flex -translate-y-1/2 flex-col gap-2.5"
+      className="absolute right-6 top-1/2 z-[1100] flex -translate-y-1/2 flex-col gap-2.5"
       {...stopMapPropagation}
     >
       <Fab label="Layers" onClick={onOpenLayers} accent>
