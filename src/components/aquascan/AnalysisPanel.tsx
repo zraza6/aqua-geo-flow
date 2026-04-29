@@ -10,9 +10,12 @@ import {
   Scale,
   TrendingUp,
   AlertTriangle,
+  FileDown,
+  CheckCircle2,
 } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
 import { stopMapPropagation } from "./stopMap";
 
 export type SimulationStatus =
