@@ -153,7 +153,7 @@ export const MarketingSections = () => {
           {/* Left — Interactive UI card */}
           <motion.div
             {...fadeUp}
-            className="liquid-glass rounded-3xl p-8 lg:col-span-3"
+            className="liquid-glass rounded-3xl p-8 lg:col-span-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_30px_-5px_rgba(34,211,238,0.3)]"
           >
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-white/90 text-lg font-medium">UI: AquaScan</h3>
@@ -172,7 +172,7 @@ export const MarketingSections = () => {
           <motion.div
             {...fadeUp}
             transition={{ ...fadeUp.transition, delay: 0.1 }}
-            className="bg-[#0a0a0a] border border-white/10 rounded-3xl p-8 lg:col-span-2"
+            className="bg-[#0a0a0a] border border-white/10 rounded-3xl p-8 lg:col-span-2 transition-all duration-300 hover:-translate-y-1 hover:border-cyan-500/30 hover:shadow-[0_0_30px_-5px_rgba(34,211,238,0.3)]"
           >
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-white/90 text-lg font-medium">Backend: HeavyWater</h3>
