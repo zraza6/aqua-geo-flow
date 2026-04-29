@@ -9,9 +9,6 @@ import {
   ShieldAlert,
   Scale,
   TrendingUp,
-  Leaf,
-  Building2,
-  CheckCircle2,
   AlertTriangle,
 } from "lucide-react";
 import { useMemo } from "react";
@@ -93,11 +90,11 @@ export function AnalysisPanel({
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: 24, opacity: 0 }}
       transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-      className="pointer-events-auto mr-20 flex h-[70vh] w-[480px] flex-col overflow-hidden rounded-2xl border border-cyan-400/20 bg-slate-950/85 backdrop-blur-2xl shadow-[0_0_40px_-8px_rgba(34,211,238,0.35),0_20px_60px_-15px_rgba(0,0,0,0.7)]"
+      className="pointer-events-auto mr-20 flex h-[70vh] w-[480px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-950/75 backdrop-blur-xl shadow-[0_0_20px_-5px_rgba(34,211,238,0.15),0_8px_32px_rgba(0,0,0,0.5)]"
       {...stopMapPropagation}
     >
       {/* === STICKY HEADER === */}
-      <header className="relative shrink-0 border-b border-white/10 bg-slate-950/70 px-6 py-5 backdrop-blur-xl">
+      <header className="relative shrink-0 border-b border-white/10 bg-slate-950/80 px-6 pb-6 pt-5 backdrop-blur-xl">
         <button
           onClick={onClose}
           disabled={running}
@@ -129,7 +126,7 @@ export function AnalysisPanel({
       </header>
 
       {/* === SCROLLABLE BODY === */}
-      <div className="dark-scrollbar min-h-0 flex-1 overflow-y-auto overscroll-contain">
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
         <div className="flex flex-col gap-5 p-5">
           {/* A — HYDROLOGICAL */}
           <Module
@@ -237,7 +234,7 @@ export function AnalysisPanel({
       </div>
 
       {/* === STICKY FOOTER === */}
-      <footer className="shrink-0 border-t border-white/10 bg-slate-900/95 px-5 py-4 backdrop-blur-xl">
+      <footer className="shrink-0 border-t border-white/10 bg-slate-950 px-5 py-4">
         <SimulatorButton
           status={simulationStatus}
           onSimulate={onSimulate}
