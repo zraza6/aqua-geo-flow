@@ -27,7 +27,14 @@ function InteractiveTerrain() {
   // Larger, more dominant SVG. Same coord system for the curve and the drag node.
   const W = 520;
   const H = 320;
-  const x = useMotionValue(W * 0.4);
+  const startX = W * 0.4;
+  const x = useMotionValue(startX);
+
+  useEffect(() => {
+    const reset = () => x.set(startX);
+    window.addEventListener("aquascan:reset-demo", reset);
+    return () => window.removeEventListener("aquascan:reset-demo", reset);
+  }, [x, startX]);
 
   // Strict sine wave terrain — much larger amplitude. Same formula for path AND dot Y.
   const curveY = (xv: number) =>
