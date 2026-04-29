@@ -132,6 +132,26 @@ function MapTuning() {
   return null;
 }
 
+/** Pushes the current map center/zoom into the viewportBus on every move/zoom end. */
+function ViewportTracker() {
+  const map = useMapEvents({
+    moveend: () => {
+      const c = map.getCenter();
+      viewportBus.set({ lat: c.lat, lng: c.lng, zoom: map.getZoom() });
+    },
+    zoomend: () => {
+      const c = map.getCenter();
+      viewportBus.set({ lat: c.lat, lng: c.lng, zoom: map.getZoom() });
+    },
+  });
+  useEffect(() => {
+    const c = map.getCenter();
+    viewportBus.set({ lat: c.lat, lng: c.lng, zoom: map.getZoom() });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return null;
+}
+
 const DEM_STYLE: L.PathOptions = {
   color: "#fbbf24",
   weight: 2,
@@ -348,6 +368,7 @@ const AquaMapInner = forwardRef<AquaMapHandle, Props>(function AquaMapInner(
       worldCopyJump
     >
       <MapTuning />
+      <ViewportTracker />
       <DrawBridge onReady={(s) => (startDrawRef.current = s)} />
 
       <TileLayer
