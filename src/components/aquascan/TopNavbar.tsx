@@ -44,10 +44,10 @@ export function TopNavbar() {
           <button
             type="button"
             onClick={() => {
-              const el = document.getElementById("hero");
+              const el = document.getElementById("introducere");
               if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
             }}
-            aria-label="Scroll to Aqua Scan Pro hero section"
+            aria-label="Scroll to Introducere section"
             className="group flex items-center gap-2.5 rounded-2xl border border-transparent px-1 py-0.5 text-left transition-colors hover:border-white/10 hover:bg-white/5 focus:outline-none focus-visible:border-cyan-400/40"
           >
             <div className="flex h-8 w-8 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-400 to-cyan-600 shadow-[0_0_18px_rgba(34,211,238,0.55)] transition-transform group-hover:scale-105">
