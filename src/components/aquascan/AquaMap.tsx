@@ -319,7 +319,7 @@ function StaticOverlays({
 }
 
 const AquaMapInner = forwardRef<AquaMapHandle, Props>(function AquaMapInner(
-  { onPolygonComplete, onOpenLayers, layers },
+  { onPolygonComplete, onOpenLayers, layers, panelOpen },
   ref,
 ) {
   const fgRef = useRef<L.FeatureGroup | null>(null);
