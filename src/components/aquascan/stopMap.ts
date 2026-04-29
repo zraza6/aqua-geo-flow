@@ -16,6 +16,7 @@ export const stopMapPropagation = {
   onWheel: (e: React.WheelEvent) => e.stopPropagation(),
 } as const;
 
-/** Tailwind classes for the canonical Liquid Glass panel. */
+/** Tailwind classes for the canonical Liquid Glass panel.
+ *  Unified premium obsidian/cyan theme — used by every floating panel. */
 export const GLASS =
-  "bg-slate-900/70 backdrop-blur-md border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)] rounded-2xl";
+  "bg-slate-950/75 backdrop-blur-xl border border-white/10 shadow-[0_0_20px_-5px_rgba(34,211,238,0.15),0_8px_32px_rgba(0,0,0,0.5)] rounded-2xl";
