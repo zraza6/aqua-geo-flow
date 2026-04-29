@@ -99,11 +99,11 @@ export function AnalysisPanel({
 
   return (
     <motion.aside
-      initial={{ x: 24, opacity: 0 }}
+      initial={{ x: -24, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
-      exit={{ x: 24, opacity: 0 }}
+      exit={{ x: -24, opacity: 0 }}
       transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-      className="pointer-events-auto flex h-full w-[calc(100vw-7rem)] max-w-[340px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-900/70 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-md"
+      className="pointer-events-auto flex max-h-[75vh] w-[calc(100vw-7rem)] max-w-[340px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-900/70 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-md"
       {...stopMapPropagation}
     >
       {/* Header */}
@@ -133,7 +133,7 @@ export function AnalysisPanel({
         </div>
       </div>
 
-      <div className="no-scrollbar flex-1 overflow-y-auto px-4 py-4">
+      <div className="no-scrollbar min-h-0 flex-1 overflow-y-auto px-4 py-4 pb-4">
         <Accordion
           type="multiple"
           defaultValue={["hydro", "geo", "env", "econ"]}
@@ -257,7 +257,7 @@ export function AnalysisPanel({
       </div>
 
       {/* Decision footer */}
-      <div className="border-t border-white/10 bg-slate-950/40 px-4 py-4">
+      <div className="shrink-0 border-t border-white/10 bg-slate-900/95 px-4 py-4 backdrop-blur-md">
         <SimulatorButton
           status={simulationStatus}
           onSimulate={onSimulate}

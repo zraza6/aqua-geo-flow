@@ -11,32 +11,39 @@ const fadeUp = {
 
 /* ------------ Interactive Terrain Profile (Section A · Left Card) ------------ */
 function InteractiveTerrain() {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const TRACK_WIDTH = 300;
+  // Single shared coordinate system: a 300×220 SVG. Drag node lives INSIDE
+  // the SVG so the math for the curve and the dot is identical.
+  const W = 300;
+  const H = 220;
   const x = useMotionValue(120);
 
-  // Terrain SVG curve: y(x) -> elevation. We mirror the SVG path math here.
-  const curveY = (xv: number) => {
-    const t = xv / TRACK_WIDTH;
-    // Sine-like terrain: high left, valley mid, ridge right
-    return 110 - 55 * Math.sin(t * Math.PI * 1.4) - 18 * Math.sin(t * Math.PI * 3.2);
-  };
+  // Strict sine wave terrain. Same formula used for SVG path AND dot Y.
+  const curveY = (xv: number) =>
+    140 - 50 * Math.sin((xv / W) * Math.PI * 1.4) - 16 * Math.sin((xv / W) * Math.PI * 3.2);
 
   const dotY = useTransform(x, (xv) => curveY(xv));
-  const ksat = useTransform(x, (xv) => (8 + (xv / TRACK_WIDTH) * 30).toFixed(1));
+  const ksat = useTransform(x, (xv) => (8 + (xv / W) * 30).toFixed(1));
   const elev = useTransform(x, (xv) => (640 - curveY(xv) * 1.6).toFixed(0));
   const risk = useTransform(x, (xv) => {
-    const v = Number((8 + (xv / TRACK_WIDTH) * 30).toFixed(1));
+    const v = 8 + (xv / W) * 30;
     if (v > 28) return "Critical Seepage";
     if (v > 18) return "High Seepage";
     return "Stable";
   });
   const rec = useTransform(x, (xv) => {
-    const v = Number((8 + (xv / TRACK_WIDTH) * 30).toFixed(1));
+    const v = 8 + (xv / W) * 30;
     if (v > 28) return "HDPE + Bentonite";
     if (v > 18) return "HDPE Liner";
     return "Compacted Clay";
   });
+
+  // Build the polyline string for the SVG curve.
+  const points = (() => {
+    const pts: string[] = [];
+    for (let i = 0; i <= W; i += 4) pts.push(`${i},${curveY(i).toFixed(2)}`);
+    return pts.join(" ");
+  })();
+  const fillPoints = `0,${H} ${points} ${W},${H}`;
 
   return (
     <div className="relative h-72 rounded-2xl overflow-hidden border border-white/5 bg-gradient-to-br from-slate-900 via-slate-950 to-black">
@@ -50,22 +57,22 @@ function InteractiveTerrain() {
         }}
       />
       {/* corner labels */}
-      <div className="absolute top-3 left-3 flex items-center gap-1.5 text-white/50">
+      <div className="absolute top-3 left-3 flex items-center gap-1.5 text-white/50 z-10">
         <MapPin className="h-3 w-3" />
         <span className="font-mono text-[10px] uppercase tracking-widest">
           Terrain Profile · Drag Node
         </span>
       </div>
-      <div className="absolute top-3 right-3 font-mono text-[10px] uppercase tracking-[0.2em] text-cyan-400/80">
+      <div className="absolute top-3 right-3 font-mono text-[10px] uppercase tracking-[0.2em] text-cyan-400/80 z-10">
         Live · DEM
       </div>
 
-      {/* SVG terrain curve */}
+      {/* SVG terrain — uses exact pixel coordinates (no preserveAspectRatio scaling) */}
       <svg
-        className="absolute inset-x-0 bottom-0 w-full"
-        viewBox={`0 0 ${TRACK_WIDTH} 200`}
-        preserveAspectRatio="none"
-        style={{ height: "75%" }}
+        width={W}
+        height={H}
+        viewBox={`0 0 ${W} ${H}`}
+        className="absolute left-1/2 bottom-4 -translate-x-1/2 overflow-visible"
       >
         <defs>
           <linearGradient id="terrainFill" x1="0" y1="0" x2="0" y2="1">
@@ -73,53 +80,39 @@ function InteractiveTerrain() {
             <stop offset="100%" stopColor="rgba(34,211,238,0)" />
           </linearGradient>
         </defs>
-        {/* Build polyline points matching curveY() */}
-        {(() => {
-          const pts: string[] = [];
-          for (let i = 0; i <= TRACK_WIDTH; i += 4) pts.push(`${i},${curveY(i)}`);
-          const line = pts.join(" ");
-          const fill = `0,200 ${line} ${TRACK_WIDTH},200`;
-          return (
-            <>
-              <polygon points={fill} fill="url(#terrainFill)" />
-              <polyline
-                points={line}
-                fill="none"
-                stroke="rgba(34,211,238,0.85)"
-                strokeWidth="1.5"
-              />
-            </>
-          );
-        })()}
+        <polygon points={fillPoints} fill="url(#terrainFill)" />
+        <polyline
+          points={points}
+          fill="none"
+          stroke="rgba(34,211,238,0.9)"
+          strokeWidth="1.5"
+        />
+
+        {/* Drag node — lives in the SAME SVG coord system as the polyline.
+            Foreign-object hosts the framer-motion draggable so its (x,y) maps 1:1 to viewBox units. */}
+        <foreignObject x={0} y={0} width={W} height={H} style={{ overflow: "visible" }}>
+          <motion.div
+            drag="x"
+            dragConstraints={{ left: 0, right: W }}
+            dragElastic={0}
+            dragMomentum={false}
+            style={{ x, y: dotY, width: 0, height: 0 }}
+            className="absolute left-0 top-0 cursor-grab active:cursor-grabbing"
+            whileTap={{ scale: 1.25 }}
+          >
+            <span className="relative -ml-2.5 -mt-2.5 flex h-5 w-5 items-center justify-center">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400/70" />
+              <span className="relative inline-flex h-3 w-3 rounded-full bg-amber-400 ring-2 ring-amber-200/40 [box-shadow:0_0_14px_rgba(251,191,36,0.9)]" />
+            </span>
+            <span className="absolute -top-5 left-3 whitespace-nowrap font-mono text-[10px] font-semibold text-amber-300">
+              Node A3
+            </span>
+          </motion.div>
+        </foreignObject>
       </svg>
 
-      {/* Drag track + node */}
-      <div
-        ref={trackRef}
-        className="absolute left-1/2 -translate-x-1/2 bottom-6"
-        style={{ width: TRACK_WIDTH, height: 150 }}
-      >
-        <motion.div
-          drag="x"
-          dragConstraints={{ left: 0, right: TRACK_WIDTH }}
-          dragElastic={0}
-          dragMomentum={false}
-          style={{ x, y: dotY, top: 0, left: -10 }}
-          className="absolute z-10 cursor-grab active:cursor-grabbing"
-          whileTap={{ scale: 1.25 }}
-        >
-          <span className="relative flex h-5 w-5 -translate-y-1/2 items-center justify-center">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400/70" />
-            <span className="relative inline-flex h-3 w-3 rounded-full bg-amber-400 ring-2 ring-amber-200/40 [box-shadow:0_0_14px_rgba(251,191,36,0.9)]" />
-          </span>
-          <span className="absolute -top-3 left-5 font-mono text-[10px] font-semibold text-amber-300">
-            Node A3
-          </span>
-        </motion.div>
-      </div>
-
       {/* Live tooltip */}
-      <div className="absolute bottom-4 right-4 rounded-xl border border-white/10 bg-slate-900/80 backdrop-blur-md px-3 py-2 shadow-[0_8px_24px_rgba(0,0,0,0.5)]">
+      <div className="absolute bottom-4 right-4 rounded-xl border border-white/10 bg-slate-900/80 backdrop-blur-md px-3 py-2 shadow-[0_8px_24px_rgba(0,0,0,0.5)] z-10">
         <p className="font-mono text-[10px] text-white/90 leading-relaxed tabular-nums">
           <span className="text-cyan-400">Elev:</span>{" "}
           <motion.span>{elev}</motion.span> m
