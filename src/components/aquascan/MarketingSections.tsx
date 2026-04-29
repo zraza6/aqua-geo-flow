@@ -197,7 +197,13 @@ export const MarketingSections = () => {
             className="mt-6 bg-gradient-to-br from-white via-white to-cyan-200/80 bg-clip-text text-5xl font-bold text-transparent sm:text-6xl md:text-7xl"
             style={{ letterSpacing: "-0.02em", fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}
           >
-            Aqua Scan
+            Aqua Scan{" "}
+            <span
+              className="bg-gradient-to-br from-cyan-300 via-cyan-400 to-cyan-500 bg-clip-text text-transparent"
+              style={{ textShadow: "0 0 30px rgba(34,211,238,0.5)" }}
+            >
+              Pro
+            </span>
             <span
               className="mt-3 block text-xl font-light text-white/55 sm:text-2xl md:text-3xl"
               style={{ letterSpacing: "-0.01em" }}
@@ -208,7 +214,7 @@ export const MarketingSections = () => {
           <motion.p
             {...fadeUp}
             transition={{ ...fadeUp.transition, delay: 0.1 }}
-            className="mx-auto mt-10 max-w-2xl text-lg leading-relaxed text-white/75 md:text-xl"
+            className="mx-auto mt-10 max-w-2xl text-xl leading-relaxed text-white/75 md:text-2xl"
             style={{ letterSpacing: "-0.02em" }}
           >
             A Spatial Data Science platform for the technical and legal{" "}
