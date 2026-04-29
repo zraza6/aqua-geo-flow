@@ -40,9 +40,17 @@ export function TopNavbar() {
         <div
           className={`${GLASS} flex items-center gap-3 px-4 py-2.5 sm:gap-5 sm:px-6 sm:py-3`}
         >
-          {/* Logo */}
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-400 to-cyan-600 shadow-[0_0_18px_rgba(34,211,238,0.55)]">
+          {/* Logo — click to scroll to hero */}
+          <button
+            type="button"
+            onClick={() => {
+              const el = document.getElementById("hero");
+              if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
+            aria-label="Scroll to Aqua Scan Pro hero section"
+            className="group flex items-center gap-2.5 rounded-2xl border border-transparent px-1 py-0.5 text-left transition-colors hover:border-white/10 hover:bg-white/5 focus:outline-none focus-visible:border-cyan-400/40"
+          >
+            <div className="flex h-8 w-8 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-400 to-cyan-600 shadow-[0_0_18px_rgba(34,211,238,0.55)] transition-transform group-hover:scale-105">
               <Globe2 className="h-4 w-4 text-slate-950" strokeWidth={2.5} />
             </div>
             <div className="flex flex-col leading-tight">
@@ -56,7 +64,7 @@ export function TopNavbar() {
                 European Hydro-Intelligence Center
               </p>
             </div>
-          </div>
+          </button>
 
           <span className="hidden h-7 w-px bg-white/10 md:block" />
 
