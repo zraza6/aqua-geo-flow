@@ -146,6 +146,179 @@ function InteractiveTerrain() {
 export const MarketingSections = () => {
   return (
     <>
+      {/* SECTION 0 — HERO / BRAND INTRO */}
+      <section className="relative overflow-hidden border-t border-white/5 bg-[#030712] px-6 py-28">
+        <div
+          className="pointer-events-none absolute inset-0 opacity-40"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle at 50% 0%, rgba(34,211,238,0.18), transparent 55%)",
+          }}
+        />
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.07]"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(34,211,238,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(34,211,238,0.5) 1px, transparent 1px)",
+            backgroundSize: "60px 60px",
+          }}
+        />
+        <div className="relative mx-auto max-w-5xl text-center">
+          <motion.span
+            {...fadeUp}
+            className="inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/5 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.28em] text-cyan-300 [text-shadow:0_0_10px_rgba(34,211,238,0.5)]"
+          >
+            <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 [box-shadow:0_0_8px_rgba(34,211,238,0.9)]" />
+            Spatial Data Science Platform
+          </motion.span>
+          <motion.h1
+            {...fadeUp}
+            transition={{ ...fadeUp.transition, delay: 0.05 }}
+            className="mt-6 bg-gradient-to-br from-white via-white to-cyan-200/80 bg-clip-text text-5xl font-bold tracking-tight text-transparent sm:text-6xl md:text-7xl"
+          >
+            HeavyWater
+            <span className="mt-2 block text-2xl font-light tracking-[0.04em] text-white/55 sm:text-3xl md:text-4xl">
+              Architecture Analysis
+            </span>
+          </motion.h1>
+          <motion.p
+            {...fadeUp}
+            transition={{ ...fadeUp.transition, delay: 0.1 }}
+            className="mx-auto mt-8 max-w-2xl text-base leading-relaxed text-white/70"
+          >
+            A Spatial Data Science platform for the technical and legal{" "}
+            <strong className="font-semibold text-white">pre-feasibility</strong> of
+            hydrotechnical infrastructure —{" "}
+            <strong className="font-semibold text-cyan-300">Canals, Dams, Reservoirs</strong>.
+          </motion.p>
+          <motion.p
+            {...fadeUp}
+            transition={{ ...fadeUp.transition, delay: 0.15 }}
+            className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-white/50"
+          >
+            Reducing feasibility studies from{" "}
+            <span className="text-white/80">months of field work</span> to{" "}
+            <span className="text-cyan-300">seconds of cloud processing</span>, in
+            compliance with Romanian Water Law 107/1996.
+          </motion.p>
+
+          <motion.div
+            {...fadeUp}
+            transition={{ ...fadeUp.transition, delay: 0.22 }}
+            className="mx-auto mt-10 flex flex-wrap justify-center gap-2.5"
+          >
+            {["Python", "GeoPandas", "NetCDF4", "Copernicus API", "PostGIS", "Earth Engine"].map(
+              (t) => (
+                <span
+                  key={t}
+                  className="rounded-full border border-white/10 bg-slate-950/75 px-3.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-white/70 backdrop-blur-xl transition-all hover:border-cyan-400/40 hover:text-cyan-300 hover:[box-shadow:0_0_18px_-4px_rgba(34,211,238,0.5)]"
+                >
+                  {t}
+                </span>
+              ),
+            )}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* SECTION 0b — DATA & ALGORITHMS */}
+      <section className="border-t border-white/5 bg-[#030712] px-6 py-24">
+        <motion.div {...fadeUp} className="mx-auto max-w-6xl">
+          <div className="mb-12 text-center">
+            <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-cyan-400/80">
+              Data &amp; Algorithms
+            </p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white/90 md:text-4xl">
+              Open-Source Earth Observation, Deterministic Logic
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <div className="rounded-3xl border border-white/10 bg-slate-950/75 p-8 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/30 hover:[box-shadow:0_0_30px_-5px_rgba(34,211,238,0.3)]">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-cyan-400/30 bg-cyan-400/10">
+                  <Database className="h-5 w-5 text-cyan-300" />
+                </div>
+                <h3 className="text-lg font-semibold text-white">Data Sources</h3>
+              </div>
+              <ul className="mt-6 flex flex-col gap-3">
+                {[
+                  { icon: Layers, name: "CLMS", detail: "Imperviousness · urban exclusion zones" },
+                  { icon: Mountain, name: "Copernicus GLO-30 DEM", detail: "30m global elevation model" },
+                  { icon: Radar, name: "EGMS (InSAR)", detail: "L3 vertical subsidence, mm/yr" },
+                  { icon: Droplets, name: "GloFAS & SoilGrids", detail: "Discharge ensembles + Ksat / pH" },
+                ].map((d) => (
+                  <li
+                    key={d.name}
+                    className="flex items-start gap-3 rounded-xl border border-white/5 bg-white/[0.02] p-3"
+                  >
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-cyan-400/20 bg-cyan-400/[0.06]">
+                      <d.icon className="h-4 w-4 text-cyan-300" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-[12.5px] font-semibold text-white">
+                        {d.name}
+                      </span>
+                      <span className="text-[11px] font-light leading-snug text-white/55">
+                        {d.detail}
+                      </span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="rounded-3xl border border-white/10 bg-slate-950/75 p-8 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/30 hover:[box-shadow:0_0_30px_-5px_rgba(34,211,238,0.3)]">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-cyan-400/30 bg-cyan-400/10">
+                  <Workflow className="h-5 w-5 text-cyan-300" />
+                </div>
+                <h3 className="text-lg font-semibold text-white">Algorithm Logic</h3>
+              </div>
+              <ul className="mt-6 flex flex-col gap-3">
+                {[
+                  {
+                    icon: Workflow,
+                    name: "Dijkstra — Optimal Routing",
+                    detail:
+                      "Cost-surface shortest path across DEM + impedance grids for canal alignment.",
+                  },
+                  {
+                    icon: Cpu,
+                    name: "minimum_filter — Dam Identification",
+                    detail:
+                      "SciPy ndimage scan to detect natural valley closures suitable for dam walls.",
+                  },
+                  {
+                    icon: Code2,
+                    name: "Pedotransfer — Seepage Risk",
+                    detail:
+                      "If Ksat > 20 mm/h, automatic recommendation: HDPE impermeable membrane.",
+                  },
+                ].map((d) => (
+                  <li
+                    key={d.name}
+                    className="flex items-start gap-3 rounded-xl border border-white/5 bg-white/[0.02] p-3"
+                  >
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-cyan-400/20 bg-cyan-400/[0.06]">
+                      <d.icon className="h-4 w-4 text-cyan-300" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-[12.5px] font-semibold text-white">
+                        {d.name}
+                      </span>
+                      <span className="text-[11px] font-light leading-snug text-white/55">
+                        {d.detail}
+                      </span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </motion.div>
+      </section>
+
       {/* SECTION A — PRODUCT SYNERGY */}
       <section className="bg-[#030712] py-24 px-6">
         <motion.h2
