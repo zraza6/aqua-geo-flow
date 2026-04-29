@@ -11,15 +11,14 @@ const fadeUp = {
 
 /* ------------ Interactive Terrain Profile (Section A · Left Card) ------------ */
 function InteractiveTerrain() {
-  // Single shared coordinate system: a 300×220 SVG. Drag node lives INSIDE
-  // the SVG so the math for the curve and the dot is identical.
-  const W = 300;
-  const H = 220;
-  const x = useMotionValue(120);
+  // Larger, more dominant SVG. Same coord system for the curve and the drag node.
+  const W = 520;
+  const H = 320;
+  const x = useMotionValue(W * 0.4);
 
-  // Strict sine wave terrain. Same formula used for SVG path AND dot Y.
+  // Strict sine wave terrain — much larger amplitude. Same formula for path AND dot Y.
   const curveY = (xv: number) =>
-    140 - 50 * Math.sin((xv / W) * Math.PI * 1.4) - 16 * Math.sin((xv / W) * Math.PI * 3.2);
+    180 - 92 * Math.sin((xv / W) * Math.PI * 1.4) - 28 * Math.sin((xv / W) * Math.PI * 3.2);
 
   const dotY = useTransform(x, (xv) => curveY(xv));
   const ksat = useTransform(x, (xv) => (8 + (xv / W) * 30).toFixed(1));
@@ -46,37 +45,55 @@ function InteractiveTerrain() {
   const fillPoints = `0,${H} ${points} ${W},${H}`;
 
   return (
-    <div className="relative h-72 rounded-2xl overflow-hidden border border-white/5 bg-gradient-to-br from-slate-900 via-slate-950 to-black">
+    <div className="relative h-[420px] rounded-2xl overflow-hidden border border-white/5 bg-gradient-to-br from-slate-900 via-slate-950 to-black">
       {/* grid */}
       <div
         className="absolute inset-0 opacity-25"
         style={{
           backgroundImage:
             "linear-gradient(rgba(34,211,238,0.18) 1px, transparent 1px), linear-gradient(90deg, rgba(34,211,238,0.18) 1px, transparent 1px)",
-          backgroundSize: "32px 32px",
+          backgroundSize: "40px 40px",
         }}
       />
       {/* corner labels */}
-      <div className="absolute top-3 left-3 flex items-center gap-1.5 text-white/50 z-10">
+      <div className="absolute top-4 left-4 flex items-center gap-1.5 text-white/50 z-10">
         <MapPin className="h-3 w-3" />
         <span className="font-mono text-[10px] uppercase tracking-widest">
           Terrain Profile · Drag Node
         </span>
       </div>
-      <div className="absolute top-3 right-3 font-mono text-[10px] uppercase tracking-[0.2em] text-cyan-400/80 z-10">
-        Live · DEM
+      <div className="absolute top-4 right-4 flex flex-col items-end gap-2 z-10">
+        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-cyan-400/80">
+          Live · DEM
+        </span>
+        {/* Live tooltip — moved to TOP RIGHT, directly under "LIVE · DEM" */}
+        <div className="rounded-xl border border-white/10 bg-slate-900/80 backdrop-blur-md px-3 py-2 shadow-[0_8px_24px_rgba(0,0,0,0.5)]">
+          <p className="font-mono text-[10px] text-white/90 leading-relaxed tabular-nums text-left">
+            <span className="text-cyan-400">Elev:</span>{" "}
+            <motion.span>{elev}</motion.span> m
+            <br />
+            <span className="text-cyan-400">Ksat:</span>{" "}
+            <motion.span>{ksat}</motion.span> mm/h
+            <br />
+            <span className="text-cyan-400">Risk:</span>{" "}
+            <motion.span className="text-rose-400">{risk}</motion.span>
+            <br />
+            <span className="text-cyan-400">Rec:</span>{" "}
+            <motion.span className="text-emerald-400">{rec}</motion.span>
+          </p>
+        </div>
       </div>
 
-      {/* SVG terrain — uses exact pixel coordinates (no preserveAspectRatio scaling) */}
+      {/* SVG terrain — exact pixel coordinates, no aspect-ratio scaling */}
       <svg
         width={W}
         height={H}
         viewBox={`0 0 ${W} ${H}`}
-        className="absolute left-1/2 bottom-4 -translate-x-1/2 overflow-visible"
+        className="absolute left-1/2 bottom-6 -translate-x-1/2 overflow-visible"
       >
         <defs>
           <linearGradient id="terrainFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="rgba(34,211,238,0.25)" />
+            <stop offset="0%" stopColor="rgba(34,211,238,0.28)" />
             <stop offset="100%" stopColor="rgba(34,211,238,0)" />
           </linearGradient>
         </defs>
@@ -84,12 +101,11 @@ function InteractiveTerrain() {
         <polyline
           points={points}
           fill="none"
-          stroke="rgba(34,211,238,0.9)"
-          strokeWidth="1.5"
+          stroke="rgba(34,211,238,0.95)"
+          strokeWidth="2"
         />
 
-        {/* Drag node — lives in the SAME SVG coord system as the polyline.
-            Foreign-object hosts the framer-motion draggable so its (x,y) maps 1:1 to viewBox units. */}
+        {/* Drag node lives in the SAME SVG coord system as the polyline. */}
         <foreignObject x={0} y={0} width={W} height={H} style={{ overflow: "visible" }}>
           <motion.div
             drag="x"
@@ -110,23 +126,6 @@ function InteractiveTerrain() {
           </motion.div>
         </foreignObject>
       </svg>
-
-      {/* Live tooltip */}
-      <div className="absolute bottom-4 right-4 rounded-xl border border-white/10 bg-slate-900/80 backdrop-blur-md px-3 py-2 shadow-[0_8px_24px_rgba(0,0,0,0.5)] z-10">
-        <p className="font-mono text-[10px] text-white/90 leading-relaxed tabular-nums">
-          <span className="text-cyan-400">Elev:</span>{" "}
-          <motion.span>{elev}</motion.span> m
-          <br />
-          <span className="text-cyan-400">Ksat:</span>{" "}
-          <motion.span>{ksat}</motion.span> mm/h
-          <br />
-          <span className="text-cyan-400">Risk:</span>{" "}
-          <motion.span className="text-rose-400">{risk}</motion.span>
-          <br />
-          <span className="text-cyan-400">Rec:</span>{" "}
-          <motion.span className="text-emerald-400">{rec}</motion.span>
-        </p>
-      </div>
     </div>
   );
 }
