@@ -153,7 +153,7 @@ export const MarketingSections = () => {
           {/* Left — Interactive UI card */}
           <motion.div
             {...fadeUp}
-            className="liquid-glass rounded-3xl p-8 lg:col-span-3"
+            className="liquid-glass rounded-3xl p-8 lg:col-span-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_30px_-5px_rgba(34,211,238,0.3)]"
           >
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-white/90 text-lg font-medium">UI: AquaScan</h3>
@@ -172,7 +172,7 @@ export const MarketingSections = () => {
           <motion.div
             {...fadeUp}
             transition={{ ...fadeUp.transition, delay: 0.1 }}
-            className="bg-[#0a0a0a] border border-white/10 rounded-3xl p-8 lg:col-span-2"
+            className="bg-[#0a0a0a] border border-white/10 rounded-3xl p-8 lg:col-span-2 transition-all duration-300 hover:-translate-y-1 hover:border-cyan-500/30 hover:shadow-[0_0_30px_-5px_rgba(34,211,238,0.3)]"
           >
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-white/90 text-lg font-medium">Backend: HeavyWater</h3>
@@ -199,6 +199,42 @@ export const MarketingSections = () => {
             </p>
           </motion.div>
         </div>
+
+        {/* Bottom row — Live Telemetry Feed (fills empty space) */}
+        <motion.div
+          {...fadeUp}
+          transition={{ ...fadeUp.transition, delay: 0.18 }}
+          className="max-w-6xl mx-auto mt-6 liquid-glass rounded-3xl p-6 border border-white/5 transition-all duration-300 hover:border-cyan-500/30 hover:shadow-[0_0_30px_-5px_rgba(34,211,238,0.3)]"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+              </span>
+              <h3 className="text-white/90 text-sm font-medium">Live Telemetry Feed</h3>
+            </div>
+            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-emerald-400/80">
+              streaming · stdout
+            </span>
+          </div>
+          <div className="rounded-2xl bg-black/60 border border-white/5 p-4 font-mono text-[12px] leading-relaxed text-white/75 max-h-44 overflow-hidden">
+            {[
+              { t: "19:24:01", msg: "Fetching GLO-30 DEM tile [N46_E023]…", tail: "OK", tone: "text-emerald-400" },
+              { t: "19:24:02", msg: "Querying SoilGrids Ksat layer…", tail: "22.4 mm/h", tone: "text-cyan-300" },
+              { t: "19:24:03", msg: "Calculating Dijkstra optimal path…", tail: "score 82.4", tone: "text-amber-300" },
+              { t: "19:24:04", msg: "EGMS InSAR vertical sample…", tail: "-2.1 mm/yr", tone: "text-amber-300" },
+              { t: "19:24:05", msg: "GloFAS discharge ensemble fetched…", tail: "OK", tone: "text-emerald-400" },
+              { t: "19:24:06", msg: "PostGIS commit · scenario_v3…", tail: "0.42s", tone: "text-emerald-400" },
+            ].map((row) => (
+              <div key={row.t} className="flex items-center gap-3">
+                <span className="text-white/30">[{row.t}]</span>
+                <span className="flex-1 truncate">{row.msg}</span>
+                <span className={row.tone}>{row.tail}</span>
+              </div>
+            ))}
+          </div>
+        </motion.div>
       </section>
 
       {/* SECTION B — ROADMAP */}
@@ -247,7 +283,7 @@ export const MarketingSections = () => {
       <section className="bg-[#030712] py-24 px-6 border-t border-white/5">
         <motion.h2
           {...fadeUp}
-          className="text-center text-white font-semibold uppercase mb-16 text-5xl md:text-6xl tracking-[0.08em] [text-shadow:0_0_30px_rgba(34,211,238,0.15)]"
+          className="text-center text-white font-semibold uppercase mb-16 text-3xl md:text-4xl tracking-[0.18em] [text-shadow:0_0_24px_rgba(34,211,238,0.18)]"
         >
           SaaS Financial Model
         </motion.h2>
@@ -259,7 +295,7 @@ export const MarketingSections = () => {
               { num: "3,000 EUR", label: "Estimated B2B License / month / agency" },
             ].map((s) => (
               <div key={s.num} className="text-center">
-                <div className="font-mono text-6xl md:text-7xl text-white font-bold tracking-tight tabular-nums [text-shadow:0_0_24px_rgba(34,211,238,0.35)]">
+                <div className="font-mono text-4xl md:text-5xl text-white font-bold tracking-tight tabular-nums [text-shadow:0_0_24px_rgba(34,211,238,0.35)]">
                   {s.num}
                 </div>
                 <div className="text-white/60 text-sm mt-4 max-w-[200px] mx-auto leading-snug">
