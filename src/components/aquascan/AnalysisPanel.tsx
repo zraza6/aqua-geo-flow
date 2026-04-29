@@ -257,7 +257,7 @@ export function AnalysisPanel({
       </div>
 
       {/* Decision footer */}
-      <div className="border-t border-white/10 bg-slate-950/40 px-4 py-4">
+      <div className="shrink-0 border-t border-white/10 bg-slate-900/95 px-4 py-4 backdrop-blur-md">
         <SimulatorButton
           status={simulationStatus}
           onSimulate={onSimulate}
