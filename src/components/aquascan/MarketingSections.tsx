@@ -50,13 +50,20 @@ function InteractiveTerrain() {
     return "Compacted Clay";
   });
 
-  // Build the polyline string for the SVG curve.
-  const points = (() => {
-    const pts: string[] = [];
-    for (let i = 0; i <= W; i += 4) pts.push(`${i},${curveY(i).toFixed(2)}`);
-    return pts.join(" ");
+  // Build a true smooth SVG path from the same formula that drives the locked node.
+  const terrainPath = (() => {
+    const pts = Array.from({ length: 14 }, (_, i) => {
+      const px = (i / 13) * W;
+      return { x: px, y: curveY(px) };
+    });
+    return pts.reduce((d, p, i) => {
+      if (i === 0) return `M ${p.x.toFixed(2)} ${p.y.toFixed(2)}`;
+      const prev = pts[i - 1];
+      const cx = (prev.x + p.x) / 2;
+      return `${d} Q ${prev.x.toFixed(2)} ${prev.y.toFixed(2)} ${cx.toFixed(2)} ${((prev.y + p.y) / 2).toFixed(2)}`;
+    }, "") + ` T ${W} ${curveY(W).toFixed(2)}`;
   })();
-  const fillPoints = `0,${H} ${points} ${W},${H}`;
+  const fillPath = `${terrainPath} L ${W} ${H} L 0 ${H} Z`;
 
   return (
     <div className="relative h-[420px] rounded-2xl overflow-hidden border border-white/5 bg-gradient-to-br from-slate-900 via-slate-950 to-black">
@@ -111,9 +118,9 @@ function InteractiveTerrain() {
             <stop offset="100%" stopColor="rgba(34,211,238,0)" />
           </linearGradient>
         </defs>
-        <polygon points={fillPoints} fill="url(#terrainFill)" />
-        <polyline
-          points={points}
+        <path d={fillPath} fill="url(#terrainFill)" />
+        <path
+          d={terrainPath}
           fill="none"
           stroke="rgba(34,211,238,0.95)"
           strokeWidth="2"
