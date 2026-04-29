@@ -50,18 +50,11 @@ function InteractiveTerrain() {
     return "Compacted Clay";
   });
 
-  // Build a true smooth SVG path from the same formula that drives the locked node.
+  // Build a visually smooth SVG path from the exact same formula that drives the locked node.
   const terrainPath = (() => {
-    const pts = Array.from({ length: 14 }, (_, i) => {
-      const px = (i / 13) * W;
-      return { x: px, y: curveY(px) };
-    });
-    return pts.reduce((d, p, i) => {
-      if (i === 0) return `M ${p.x.toFixed(2)} ${p.y.toFixed(2)}`;
-      const prev = pts[i - 1];
-      const cx = (prev.x + p.x) / 2;
-      return `${d} Q ${prev.x.toFixed(2)} ${prev.y.toFixed(2)} ${cx.toFixed(2)} ${((prev.y + p.y) / 2).toFixed(2)}`;
-    }, "") + ` T ${W} ${curveY(W).toFixed(2)}`;
+    const pts: string[] = [];
+    for (let i = 0; i <= W; i += 2) pts.push(`${i.toFixed(2)} ${curveY(i).toFixed(2)}`);
+    return `M ${pts.join(" L ")}`;
   })();
   const fillPath = `${terrainPath} L ${W} ${H} L 0 ${H} Z`;
 
