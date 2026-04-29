@@ -44,11 +44,16 @@ export interface AquaMapHandle {
   applyReservoirStyle: () => void;
   /** Reset all drawn shapes and recommended zones to base style. */
   reset: () => void;
+  /** Toggle vertex-edit mode on the currently active polygon. Returns new state. */
+  toggleEdit: () => boolean;
+  /** Whether edit mode is currently active. */
+  isEditing: () => boolean;
 }
 
 interface Props {
   onPolygonComplete: (p: DrawnPolygon) => void;
   onOpenLayers: () => void;
+  onAreaChange?: (km2: number) => void;
   layers: LayerState;
   panelOpen?: boolean;
 }
