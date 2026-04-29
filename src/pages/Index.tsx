@@ -189,6 +189,10 @@ const Index = () => {
         )}
 
       {analyzing && <LoadingOverlay />}
+      </div>
+
+      {/* === SCROLLABLE LANDING SECTIONS === */}
+      <MarketingSections />
     </main>
   );
 };
