@@ -1,5 +1,7 @@
 import { Layers, ZoomIn, ZoomOut, Locate, Pencil } from "lucide-react";
 import { useMap } from "react-leaflet";
+import { useEffect, useRef } from "react";
+import L from "leaflet";
 import { GLASS, stopMapPropagation } from "./stopMap";
 
 interface FabsProps {
@@ -10,8 +12,18 @@ interface FabsProps {
 /** Inner controls — must be inside <MapContainer> so useMap() works. */
 export function MapFabsInner({ onOpenLayers, onStartDraw }: FabsProps) {
   const map = useMap();
+  const wrapRef = useRef<HTMLDivElement | null>(null);
+
+  // Bullet-proof Leaflet event isolation — kills click-through to the map underneath.
+  useEffect(() => {
+    if (!wrapRef.current) return;
+    L.DomEvent.disableClickPropagation(wrapRef.current);
+    L.DomEvent.disableScrollPropagation(wrapRef.current);
+  }, []);
+
   return (
     <div
+      ref={wrapRef}
       className="absolute bottom-24 right-3 z-[1000] flex flex-col gap-2.5 sm:bottom-6 sm:right-6"
       {...stopMapPropagation}
     >
