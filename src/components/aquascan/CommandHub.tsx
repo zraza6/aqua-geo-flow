@@ -1,4 +1,4 @@
-import { LayoutDashboard, Layers, Globe2 } from "lucide-react";
+import { LayoutDashboard, Layers } from "lucide-react";
 import { stopMapPropagation, GLASS } from "./stopMap";
 
 export type CommandTab = "dashboard" | "layers";
