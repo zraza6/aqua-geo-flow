@@ -93,7 +93,7 @@ export function AnalysisPanel({
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: 24, opacity: 0 }}
       transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-      className="pointer-events-auto isolate mr-20 flex h-[80vh] max-h-[85vh] w-[480px] flex-col overflow-hidden rounded-3xl border border-white/10 bg-slate-950/75 backdrop-blur-xl shadow-[0_0_20px_-5px_rgba(34,211,238,0.15),0_8px_32px_rgba(0,0,0,0.5)] [border-radius:1.5rem] [clip-path:inset(0_round_1.5rem)] [contain:paint]"
+      className="pointer-events-auto isolate mr-20 flex h-[88vh] max-h-[90vh] w-[480px] flex-col overflow-hidden rounded-3xl border border-white/10 bg-slate-950/75 backdrop-blur-xl shadow-[0_0_20px_-5px_rgba(34,211,238,0.15),0_8px_32px_rgba(0,0,0,0.5)] [border-radius:1.5rem] [clip-path:inset(0_round_1.5rem)] [contain:paint]"
       {...stopMapPropagation}
     >
       {/* === STICKY HEADER === */}
