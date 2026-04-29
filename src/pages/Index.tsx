@@ -157,35 +157,9 @@ const Index = () => {
 
         {/* === LAYER 1: UI OVERLAY (flex grid, no overlaps) === */}
         <div className="pointer-events-none absolute inset-0 z-50 grid grid-rows-[auto_1fr_auto] gap-3 p-3 sm:gap-4 sm:p-5">
-          {/* TOP — brand + hint flex column so they stack, never overlap */}
-          <div className="pointer-events-none flex flex-col items-center gap-2.5">
+          {/* TOP — brand only */}
+          <div className="pointer-events-none flex flex-col items-center">
             <TopNavbar />
-
-            <AnimatePresence>
-              {!hasInteracted &&
-                !analyzing &&
-                simulationStatus === "idle" &&
-                !selectedBasin && (
-                  <motion.div
-                    initial={{ y: -8, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    exit={{ y: -8, opacity: 0 }}
-                    transition={{ duration: 0.25 }}
-                    className="pointer-events-none px-2"
-                    {...stopMapPropagation}
-                  >
-                    <div className="flex items-center gap-2 rounded-full border border-white/10 bg-slate-900/70 px-3.5 py-1.5 backdrop-blur-md shadow-[0_8px_24px_rgba(0,0,0,0.4)]">
-                      <span className="relative flex h-1.5 w-1.5">
-                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-75" />
-                        <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-cyan-400" />
-                      </span>
-                      <p className="font-mono text-[9.5px] font-light uppercase tracking-[0.18em] text-white/85">
-                        Click any zone · or draw an AOI anywhere on the globe
-                      </p>
-                    </div>
-                  </motion.div>
-                )}
-            </AnimatePresence>
           </div>
 
           {/* MIDDLE — left nav + context + right analysis */}
