@@ -289,10 +289,29 @@ export const MarketingSections = () => {
               </div>
               <ul className="mt-6 flex flex-col gap-3">
                 {[
-                  { icon: Layers, name: "CLMS", detail: "Imperviousness · urban exclusion zones" },
-                  { icon: Mountain, name: "Copernicus GLO-30 DEM", detail: "30m global elevation model" },
-                  { icon: Radar, name: "EGMS (InSAR)", detail: "L3 vertical subsidence, mm/yr" },
-                  { icon: Droplets, name: "GloFAS & SoilGrids", detail: "Discharge ensembles + Ksat / pH" },
+                  {
+                    icon: Layers,
+                    name: "CLMS (HRL Imperviousness)",
+                    detail:
+                      "Preluăm rastere GeoTIFF pentru a calcula coeficientul de scurgere la suprafață. Identifică zonele antropice cu infiltrare zero — esențial pentru debitele de calcul.",
+                  },
+                  {
+                    icon: Mountain,
+                    name: "Copernicus GLO-30 DEM",
+                    detail:
+                      "Integrat via CDSE API; rezoluție 30m necesară pentru modelarea pantelor și direcțiilor de curgere (Flow Direction). Fără el, calculul hidrologic al bazinelor ar fi imposibil.",
+                  },
+                  {
+                    icon: Radar,
+                    name: "EGMS (InSAR)",
+                    detail:
+                      "Fișiere L3 Ortho Vertical pentru a detecta mișcări milimetrice ale terenului pe ultimii 5 ani. Filtru critic pentru siguranța barajelor — previne amplasarea pe falii active.",
+                  },
+                  {
+                    icon: Droplets,
+                    name: "GloFAS & SoilGrids",
+                    detail: "Discharge ensembles + Ksat / pH pentru calibrarea seepage și a debitelor de proiectare.",
+                  },
                 ].map((d) => (
                   <li
                     key={d.name}
