@@ -567,6 +567,29 @@ const AquaMapInner = forwardRef<AquaMapHandle, Props>(function AquaMapInner(
       <MapFabsInner
         onOpenLayers={onOpenLayers}
         onStartDraw={() => startDrawRef.current?.()}
+        onToggleEdit={() => {
+          const layer = activeLayerRef.current;
+          if (!layer || typeof (layer as any).editing === "undefined") return false;
+          if (editingRef.current) {
+            try { (layer as any).editing.disable(); } catch {}
+            editingRef.current = false;
+            return false;
+          }
+          try {
+            (layer as any).editing.enable();
+            editingRef.current = true;
+            editHandlerRef.current = (layer as any).editing;
+            const handler = () => {
+              const latlngs = layer.getLatLngs()[0] as L.LatLng[];
+              onAreaChange?.(polygonAreaKm2(latlngs));
+            };
+            layer.on("edit", handler);
+            (layer as any).on?.("editdrag", handler);
+            return true;
+          } catch {
+            return false;
+          }
+        }}
       />
     </MapContainer>
   );
