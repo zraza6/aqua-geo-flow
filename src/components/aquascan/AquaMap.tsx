@@ -1,4 +1,5 @@
-import { MapContainer, TileLayer, FeatureGroup, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, FeatureGroup, useMap, useMapEvents } from "react-leaflet";
+import { viewportBus } from "./viewportBus";
 import L from "leaflet";
 import "leaflet-draw";
 import { EditControl } from "react-leaflet-draw";
@@ -128,6 +129,26 @@ function MapTuning() {
   useEffect(() => {
     map.attributionControl.setPrefix("");
   }, [map]);
+  return null;
+}
+
+/** Pushes the current map center/zoom into the viewportBus on every move/zoom end. */
+function ViewportTracker() {
+  const map = useMapEvents({
+    moveend: () => {
+      const c = map.getCenter();
+      viewportBus.set({ lat: c.lat, lng: c.lng, zoom: map.getZoom() });
+    },
+    zoomend: () => {
+      const c = map.getCenter();
+      viewportBus.set({ lat: c.lat, lng: c.lng, zoom: map.getZoom() });
+    },
+  });
+  useEffect(() => {
+    const c = map.getCenter();
+    viewportBus.set({ lat: c.lat, lng: c.lng, zoom: map.getZoom() });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return null;
 }
 
@@ -347,6 +368,7 @@ const AquaMapInner = forwardRef<AquaMapHandle, Props>(function AquaMapInner(
       worldCopyJump
     >
       <MapTuning />
+      <ViewportTracker />
       <DrawBridge onReady={(s) => (startDrawRef.current = s)} />
 
       <TileLayer

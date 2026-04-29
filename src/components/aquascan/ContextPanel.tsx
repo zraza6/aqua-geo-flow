@@ -6,11 +6,14 @@ import {
   Radar,
   Waves,
   Sparkles,
+  Crosshair,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Switch } from "@/components/ui/switch";
 import type { CommandTab } from "./CommandHub";
 import type { LayerState } from "./AquaMap";
 import { stopMapPropagation, GLASS } from "./stopMap";
+import { viewportBus } from "./viewportBus";
 
 interface Props {
   tab: CommandTab;
@@ -175,12 +178,43 @@ function LayersPanel({
   layers: LayerState;
   onToggleLayer: (k: keyof LayerState) => void;
 }) {
+  const [vp, setVp] = useState(viewportBus.get());
+  useEffect(() => {
+    const unsub = viewportBus.subscribe(setVp);
+    return () => {
+      unsub();
+    };
+  }, []);
+
+  const fmt = (n: number) =>
+    `${n >= 0 ? "+" : "−"}${Math.abs(n).toFixed(4)}°`;
+
   return (
     <div className="flex flex-col gap-3">
+      {/* Dynamic viewport indicator */}
+      <div className="flex items-center justify-between gap-2 rounded-xl border border-cyan-400/25 bg-cyan-400/[0.06] px-3 py-2">
+        <div className="flex items-center gap-1.5">
+          <span className="relative flex h-1.5 w-1.5">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-75" />
+            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-cyan-400" />
+          </span>
+          <Crosshair className="h-3 w-3 text-cyan-400" />
+          <p className="font-mono text-[8.5px] uppercase tracking-[0.22em] text-cyan-300">
+            Active Viewport Center
+          </p>
+        </div>
+        <p
+          className="font-mono text-[10px] font-semibold tabular-nums text-cyan-200"
+          style={{ textShadow: "0 0 8px rgba(34,211,238,0.5)" }}
+        >
+          {fmt(vp.lat)}, {fmt(vp.lng)}
+        </p>
+      </div>
+
       <ToggleRow
         icon={Waves}
         title="Sentinel-2 Water Evolution"
-        sub="Mock NDWI heatmap dots tracing river networks across the Carpathian basin."
+        sub="Surface water network tracing within the active viewport. Source: Copernicus Data Space Ecosystem (CDSE) & GloFAS."
         checked={layers.waterEvolution}
         onChange={() => onToggleLayer("waterEvolution")}
         tone="cyan"
@@ -188,7 +222,7 @@ function LayersPanel({
       <ToggleRow
         icon={Radar}
         title="SAR Urban Footprint"
-        sub="Sentinel-1 backscatter — DO NOT flood zones (Cluj, Turda, Dej)."
+        sub="Imperviousness mapping to identify DO NOT flood zones currently on screen. Source: Copernicus Land Monitoring Service (CLMS)."
         checked={layers.sarUrban}
         onChange={() => onToggleLayer("sarUrban")}
         tone="rose"
@@ -196,14 +230,16 @@ function LayersPanel({
       <ToggleRow
         icon={Mountain}
         title="DEM Hotspots"
-        sub="Algorithmically-derived dam candidate valleys."
+        sub="Algorithmically-derived dam candidate valleys using GLO-30 DEM and ISRIC SoilGrids v2.0."
         checked={layers.dem}
         onChange={() => onToggleLayer("dem")}
         tone="amber"
       />
 
-      <p className="mt-1 px-1 font-mono text-[9px] uppercase tracking-wider text-white/30">
-        Source · Copernicus Open Access Hub · ESA · 2024
+      <p className="mt-1 px-1 font-mono text-[9px] uppercase tracking-wider text-white/35">
+        <span className="text-emerald-300/80">Compliance:</span> Legea Apelor nr. 107/1996{" "}
+        <span className="text-white/25">•</span>{" "}
+        <span className="text-cyan-300/80">ROI Data:</span> SEAP
       </p>
     </div>
   );
