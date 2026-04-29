@@ -1,13 +1,10 @@
-import { stopMapPropagation } from "./stopMap";
-
 const ITEMS: { id: string; label: string }[] = [
   { id: "introducere", label: "Introducere" },
-  { id: "date-utilizate", label: "Date utilizate" },
-  { id: "algoritmi", label: "Algoritmi" },
-  { id: "business-finante", label: "Business & Finanțe" },
-  { id: "produs", label: "Produs" },
-  { id: "roadmap", label: "Roadmap" },
-  { id: "economics", label: "Economics" },
+  { id: "date-algoritmi", label: "Date și Algoritmi" },
+  { id: "arhitectura", label: "Arhitectura Produsului" },
+  { id: "scaling", label: "Scaling & Future" },
+  { id: "business", label: "Business" },
+  { id: "bibliografie", label: "Bibliografie" },
 ];
 
 export function SubNavPill() {
@@ -18,8 +15,7 @@ export function SubNavPill() {
 
   return (
     <nav
-      {...stopMapPropagation}
-      className="pointer-events-auto flex max-w-[95vw] items-center gap-1 overflow-x-auto rounded-full border border-white/10 bg-black/40 px-2 py-1.5 backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.45)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      className="pointer-events-auto inline-flex max-w-[95vw] items-center gap-1 overflow-x-auto rounded-full border border-white/10 bg-black/40 px-2 py-1.5 backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.45)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       aria-label="Section navigation"
     >
       {ITEMS.map((item, i) => (
