@@ -25,10 +25,7 @@ export function MapFabsInner({ onOpenLayers, onStartDraw, shifted }: FabsProps) 
   return (
     <div
       ref={wrapRef}
-      style={{ transition: "right 300ms cubic-bezier(0.4,0,0.2,1)" }}
-      className={`absolute bottom-24 z-[1000] flex flex-col gap-2.5 sm:bottom-6 ${
-        shifted ? "right-[30rem]" : "right-3 sm:right-6"
-      }`}
+      className="absolute right-6 top-1/2 z-[1000] flex -translate-y-1/2 flex-col gap-2.5"
       {...stopMapPropagation}
     >
       <Fab label="Layers" onClick={onOpenLayers} accent>
