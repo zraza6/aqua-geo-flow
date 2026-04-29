@@ -11,6 +11,9 @@ import {
   ShieldAlert,
   Scale,
   TrendingUp,
+  Mountain,
+  Trees,
+  Compass,
 } from "lucide-react";
 import {
   Accordion,
